@@ -22,6 +22,7 @@
 
 #include "types.h"
 
+// Declarations for current string optimized-routines
 extern int32_t __memcmp_aarch64_sve(void const* s1, void const* s2, size_t n);
 extern char* __strchr_aarch64_sve(char const* s, int32_t c);
 extern int32_t __strcmp_aarch64_sve(char const* s1, char const* s2);
@@ -31,6 +32,7 @@ extern int32_t __strncmp_aarch64_sve(char const* dst, char const* src, size_t n)
 extern size_t __strnlen_aarch64_sve(char const* s, size_t n);
 extern char* __strrchr_aarch64_sve(char const* s, int32_t c);
 
+// Declarations for the new implementations of string optimized-routines
 extern int32_t new_memcmp_aarch64_sve(void const* s1, void const* s2, size_t n);
 extern char* new_strchr_aarch64_sve(char const* s, int32_t c);
 extern int32_t new_strcmp_aarch64_sve(char const* s1, char const* s2);
@@ -40,6 +42,7 @@ extern int32_t new_strncmp_aarch64_sve(char const* dst, char const* src, size_t 
 extern size_t new_strnlen_aarch64_sve(char const* s, size_t n);
 extern char* new_strrchr_aarch64_sve(char const* s, int32_t c);
 
+// Function pointer type declarations
 typedef int32_t memcmp_fn_t(void const*, void const*, size_t);
 typedef char* strchr_fn_t(char const*, int32_t);
 typedef int32_t strcmp_fn_t(char const*, char const*);
@@ -51,7 +54,7 @@ typedef char* strrchr_fn_t(char const*, int32_t);
 
 void driver_memcmp(
     size_t nsamples,
-    size_t niters,
+    size_t nreps,
     double samples[nsamples],
     memcmp_fn_t* memcmp_fn,
     void const* s1,
@@ -61,7 +64,7 @@ void driver_memcmp(
 
 void driver_strchr(
     size_t nsamples,
-    size_t niters,
+    size_t nreps,
     double samples[nsamples],
     strchr_fn_t* strchr_fn,
     void const* s,
@@ -70,7 +73,7 @@ void driver_strchr(
 
 void driver_strcmp(
     size_t nsamples,
-    size_t niters,
+    size_t nreps,
     double samples[nsamples],
     strcmp_fn_t* strcmp_fn,
     void const* s1,
@@ -79,7 +82,7 @@ void driver_strcmp(
 
 void driver_strcpy(
     size_t nsamples,
-    size_t niters,
+    size_t nreps,
     double samples[nsamples],
     strcpy_fn_t* strcpy_fn,
     void const* dst,
@@ -88,7 +91,7 @@ void driver_strcpy(
 
 void driver_strlen(
     size_t nsamples,
-    size_t niters,
+    size_t nreps,
     double samples[nsamples],
     strlen_fn_t* strlen_fn,
     void const* s
@@ -96,7 +99,7 @@ void driver_strlen(
 
 void driver_strncmp(
     size_t nsamples,
-    size_t niters,
+    size_t nreps,
     double samples[nsamples],
     strncmp_fn_t* strncmp_fn,
     void const* s1,
@@ -106,7 +109,7 @@ void driver_strncmp(
 
 void driver_strnlen(
     size_t nsamples,
-    size_t niters,
+    size_t nreps,
     double samples[nsamples],
     strnlen_fn_t* strnlen_fn,
     void const* s,
@@ -115,7 +118,7 @@ void driver_strnlen(
 
 void driver_strrchr(
     size_t nsamples,
-    size_t niters,
+    size_t nreps,
     double samples[nsamples],
     strrchr_fn_t* strrchr_fn,
     void const* s,

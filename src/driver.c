@@ -18,7 +18,7 @@
  * USA.
  **/
 
-#define _GNU_SOURCE // needed for `clock_gettime`, not sure why though??
+#define _GNU_SOURCE
 
 #include "driver.h"
 #include "utils.h"
@@ -30,16 +30,16 @@
     struct timespec a, b;                                                                          \
     for (size_t e = 0; e < nsamples; ++e) {                                                        \
         clock_gettime(CLOCK_MONOTONIC_RAW, &a);                                                    \
-        for (size_t i = 0; i < niters; ++i) {                                                      \
+        for (size_t i = 0; i < nreps; ++i) {                                                       \
             fn(__VA_ARGS__);                                                                       \
         }                                                                                          \
         clock_gettime(CLOCK_MONOTONIC_RAW, &b);                                                    \
-        samples[e] = elapsed_ns(a, b) / (double)niters;                                            \
+        samples[e] = elapsed_ns(a, b) / (double)nreps;                                             \
     }
 
 void driver_memcmp(
     size_t nsamples,
-    size_t niters,
+    size_t nreps,
     double samples[nsamples],
     memcmp_fn_t* memcmp_fn,
     void const* s1,
@@ -51,7 +51,7 @@ void driver_memcmp(
 
 void driver_strchr(
     size_t nsamples,
-    size_t niters,
+    size_t nreps,
     double samples[nsamples],
     strchr_fn_t* strchr_fn,
     void const* s,
@@ -62,7 +62,7 @@ void driver_strchr(
 
 void driver_strcmp(
     size_t nsamples,
-    size_t niters,
+    size_t nreps,
     double samples[nsamples],
     strcmp_fn_t* strcmp_fn,
     void const* s1,
@@ -73,7 +73,7 @@ void driver_strcmp(
 
 void driver_strcpy(
     size_t nsamples,
-    size_t niters,
+    size_t nreps,
     double samples[nsamples],
     strcpy_fn_t* strcpy_fn,
     void const* dst,
@@ -84,7 +84,7 @@ void driver_strcpy(
 
 void driver_strlen(
     size_t nsamples,
-    size_t niters,
+    size_t nreps,
     double samples[nsamples],
     strlen_fn_t* strlen_fn,
     void const* s
@@ -94,7 +94,7 @@ void driver_strlen(
 
 void driver_strncmp(
     size_t nsamples,
-    size_t niters,
+    size_t nreps,
     double samples[nsamples],
     strncmp_fn_t* strncmp_fn,
     void const* s1,
@@ -106,7 +106,7 @@ void driver_strncmp(
 
 void driver_strnlen(
     size_t nsamples,
-    size_t niters,
+    size_t nreps,
     double samples[nsamples],
     strnlen_fn_t* strnlen_fn,
     void const* s,
@@ -117,7 +117,7 @@ void driver_strnlen(
 
 void driver_strrchr(
     size_t nsamples,
-    size_t niters,
+    size_t nreps,
     double samples[nsamples],
     strrchr_fn_t* strrchr_fn,
     void const* s,

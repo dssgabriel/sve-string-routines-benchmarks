@@ -26,21 +26,21 @@
 /// Benchmark information.
 typedef struct benchmark_s {
     /// Name of the old implementation.
-    char old_name[20];
+    char name_old[32];
     /// Name of the new implementation.
-    char new_name[20];
+    char name_new[32];
     /// Statistics for the old implementation.
-    statistics_t old_stats;
+    statistics_t stats_old;
     /// Statistics for the new implementation.
-    statistics_t new_stats;
+    statistics_t stats_new;
     /// Speedup of new over old.
     double speedup;
     /// Buffer size used.
     size_t buf_size;
     /// Number of samples.
     size_t nsamples;
-    /// Number of iterations (repetitions) per samples
-    size_t niters;
+    /// Number of repetitions per samples.
+    size_t nreps;
 } benchmark_t;
 
 /// Processes the results of a benchmark.
@@ -49,5 +49,4 @@ void bench_process(
 );
 
 /// Prints the results of a benchmark.
-void bench_print(benchmark_t self[static 1]);
-
+void bench_print(benchmark_t const self[static 1]);

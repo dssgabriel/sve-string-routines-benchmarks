@@ -25,52 +25,58 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define ONE_GIB (double)(1024 << 20)
+
 void bench_process(
     benchmark_t self[static 1], size_t nsamples, double old[nsamples], double new[nsamples]
 ) {
     qsort(old, nsamples, sizeof(double), cmp_double);
-    self->old_stats.min = old[0];
-    self->old_stats.med = old[nsamples / 2 + 1];
-    self->old_stats.max = old[nsamples - 1];
-    self->old_stats.avg = mean(nsamples, old);
-    self->old_stats.err = stddev(nsamples, old, self->old_stats.avg) * 100.0 / self->old_stats.avg;
+    self->stats_old.min = old[0];
+    self->stats_old.med = old[nsamples / 2 + 1];
+    self->stats_old.max = old[nsamples - 1];
+    self->stats_old.avg = mean(nsamples, old);
+    self->stats_old.err = stddev(nsamples, old, self->stats_old.avg) * 100.0 / self->stats_old.avg;
 
     qsort(new, nsamples, sizeof(double), cmp_double);
-    self->new_stats.min = new[0];
-    self->new_stats.med = new[nsamples / 2 + 1];
-    self->new_stats.max = new[nsamples - 1];
-    self->new_stats.avg = mean(nsamples, new);
-    self->new_stats.err = stddev(nsamples, new, self->new_stats.avg) * 100.0 / self->new_stats.avg;
+    self->stats_new.min = new[0];
+    self->stats_new.med = new[nsamples / 2 + 1];
+    self->stats_new.max = new[nsamples - 1];
+    self->stats_new.avg = mean(nsamples, new);
+    self->stats_new.err = stddev(nsamples, new, self->stats_new.avg) * 100.0 / self->stats_new.avg;
 
-    self->speedup = self->old_stats.avg / self->new_stats.avg;
+    self->speedup = self->stats_old.avg / self->stats_new.avg;
 }
 
-void bench_print(benchmark_t self[static 1]) {
+static inline void print_line() {
+    for (size_t i = 0; i < 17 * 4 + 14 * 4 + 22; ++i) { printf("-"); }
+    printf("\n");
+}
+
+void bench_print(benchmark_t const self[static 1]) {
     static bool header = false;
     if (!header) {
         printf(
             "%20s |%12s |%15s |%15s |%15s |%15s |%12s |%12s |%12s\n",
-            "BENCHMARK NAME",
-            "SIZE",
+            "ROUTINE IMPLEM",
+            "BUF SIZE",
             "MINIMUM ns",
             "MEDIAN ns",
             "MAXIMUM ns",
             "AVERAGE ns",
-            "ERR %",
+            "STD DEV %",
             "BW GiB/s",
             "SPEEDUP %"
         );
-        for (size_t i = 0; i < 17 * 4 + 14 * 4 + 22; ++i) { printf("-"); }
-        printf("\n");
+        print_line();
         header = true;
     }
 
     double array_size = (double)self->buf_size;
-    char* unit[] = { "B", "KiB", "MiB", "GiB", "TiB" };
+    char* const unit[] = { "B", "KiB", "MiB", "GiB", "TiB" };
     uint8_t unit_selector = 0;
     while (array_size >= 1024.0) {
         array_size /= 1024.0;
-       unit_selector += 1;
+        unit_selector += 1;
     }
     char fmt_array_size[13];
     sprintf(fmt_array_size, "%8.1lf %-3s", array_size, unit[unit_selector]);
@@ -78,32 +84,27 @@ void bench_print(benchmark_t self[static 1]) {
     fmt_array_size[12] = '\0';
 
     printf(
-        "%20s |%12s |%15.0lf |%15.0lf |%15.0lf |%15.3lf |%12.3lf |%12.3lf |%12s\n",
-        self->old_name,
+        "%20s |%12s |%15.0lf |%15.0lf |%15.0lf |%15.3lf |%12.3lf |%12.3lf |\n",
+        self->name_old,
         fmt_array_size,
-        self->old_stats.min,
-        self->old_stats.med,
-        self->old_stats.max,
-        self->old_stats.avg,
-        self->old_stats.err,
-        ((double)self->buf_size / (double)(1024 << 20)) / ns_to_s(self->old_stats.avg),
-        ""
+        self->stats_old.min,
+        self->stats_old.med,
+        self->stats_old.max,
+        self->stats_old.avg,
+        self->stats_old.err,
+        ((double)self->buf_size / ONE_GIB) / ns_to_s(self->stats_old.avg)
     );
     printf(
-        "%20s |%12s |%15.0lf |%15.0lf |%15.0lf |%15.3lf |%12.3lf |%12.3lf |%+11.1lf%%\n",
-        self->new_name,
+        "%20s |%12s |%15.0lf |%15.0lf |%15.0lf |%15.3lf |%12.3lf |%12.3lf |%+10.2lf%%\n",
+        self->name_new,
         fmt_array_size,
-        self->new_stats.min,
-        self->new_stats.med,
-        self->new_stats.max,
-        self->new_stats.avg,
-        self->new_stats.err,
-        ((double)self->buf_size / (double)(1024 << 20)) / ns_to_s(self->new_stats.avg),
+        self->stats_new.min,
+        self->stats_new.med,
+        self->stats_new.max,
+        self->stats_new.avg,
+        self->stats_new.err,
+        ((double)self->buf_size / ONE_GIB) / ns_to_s(self->stats_new.avg),
         (self->speedup - 1.0) * 100.0
     );
-
-    for (size_t i = 0; i < 17 * 4 + 14 * 4 + 22; ++i) { printf("-"); }
-    printf("\n");
+    print_line();
 }
-
-
