@@ -48,7 +48,7 @@ void bench_process(
 }
 
 static inline void print_line() {
-    for (size_t i = 0; i < 17 * 4 + 14 * 4 + 22; ++i) { printf("-"); }
+    for (size_t i = 0; i < 17 * 4 + 14 * 4 + 25; ++i) { printf("-"); }
     printf("\n");
 }
 
@@ -56,7 +56,7 @@ void bench_print(benchmark_t const self[static 1]) {
     static bool header = false;
     if (!header) {
         printf(
-            "%20s |%12s |%15s |%15s |%15s |%15s |%12s |%12s |%12s\n",
+            "%24s |%12s |%15s |%15s |%15s |%15s |%12s |%12s |%12s\n",
             "ROUTINE IMPLEM",
             "BUF SIZE",
             "MINIMUM ns",
@@ -67,9 +67,9 @@ void bench_print(benchmark_t const self[static 1]) {
             "BW GiB/s",
             "SPEEDUP %"
         );
-        print_line();
         header = true;
     }
+    print_line();
 
     double array_size = (double)self->buf_size;
     char* const unit[] = { "B", "KiB", "MiB", "GiB", "TiB" };
@@ -84,7 +84,7 @@ void bench_print(benchmark_t const self[static 1]) {
     fmt_array_size[12] = '\0';
 
     printf(
-        "%20s |%12s |%15.0lf |%15.0lf |%15.0lf |%15.3lf |%12.3lf |%12.3lf |\n",
+        "%24s |%12s |%15.0lf |%15.0lf |%15.0lf |%15.3lf |%12.3lf |%12.3lf |\n",
         self->name_old,
         fmt_array_size,
         self->stats_old.min,
@@ -95,7 +95,7 @@ void bench_print(benchmark_t const self[static 1]) {
         ((double)self->buf_size / ONE_GIB) / ns_to_s(self->stats_old.avg)
     );
     printf(
-        "%20s |%12s |%15.0lf |%15.0lf |%15.0lf |%15.3lf |%12.3lf |%12.3lf |%+10.2lf%%\n",
+        "%24s |%12s |%15.0lf |%15.0lf |%15.0lf |%15.3lf |%12.3lf |%12.3lf |%+11.2lf%%\n",
         self->name_new,
         fmt_array_size,
         self->stats_new.min,
@@ -106,5 +106,4 @@ void bench_print(benchmark_t const self[static 1]) {
         ((double)self->buf_size / ONE_GIB) / ns_to_s(self->stats_new.avg),
         (self->speedup - 1.0) * 100.0
     );
-    print_line();
 }

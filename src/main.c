@@ -41,7 +41,7 @@
 #define DRAM 268435456ULL
 
 static inline size_t determine_warmup_cnt(size_t bench_reps) {
-    return bench_reps / 10;
+    return bench_reps > 10 ? bench_reps / 10 : 1;
 }
 
 void bench_memcmp(size_t nbench, size_t const buf_sizes[nbench], size_t const bench_reps[nbench]) {
@@ -397,7 +397,7 @@ int32_t main(int32_t argc, char* argv[argc + 1]) {
     // Feel free to add additional sizes here
     size_t const buf_sizes[] = { HALF_L1D, FULL_L1D, HALF_L2, FULL_L2, HALF_L3, FULL_L3, DRAM };
     // Don't forget to add appropriate benchmark repetitions here too
-    size_t const bench_reps[] = { 10000, 5000, 250, 100, 10, 5, 1 };
+    size_t const bench_reps[] = { 500, 100, 50, 10, 5, 1, 1 };
     size_t const nbench = sizeof(buf_sizes) / sizeof(buf_sizes[0]);
 
     assert(
