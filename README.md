@@ -5,17 +5,20 @@
 
 This repository benchmarks the current implementations of some AArch64 SVE string routines from [Arm's optimized-routines library](https://github.com/ARM-software/optimized-routines) against newly proposed implementations.
 
-This project was done as part of the EMOPASS European Project and conducted at the University of Versailles — Saint-Quentin-en-Yvelines (UVSQ) by the LI-PaRAD computer science lab, in collaboration with industrial partners: SiPearl and Atos/Eviden.
+This project was done as part of the EMOPASS European Project and conducted at the University of Versailles — Saint-Quentin-en-Yvelines (UVSQ) by the LI-PaRAD computer science laboratory, and in collaboration with industrial partners: SiPearl and Atos/Eviden.
 
-Performance benchmarks in the context of HPC applications on Arm Neoverse V1 microarchitectures have shown that there are noticeable penalty when using `INCx` instructions (predicated or not) to increment the loop counter, instead of using a combination of `CNTx` (in the loop prelude) and `ADD` (in the loop). The new implementations replace the `INCx` instructions in paths where the whole vector is known to be valid (i.e., the critical path in most scenarios).
+In the context of benchmarking the performance of HPC applications on Arm Neoverse V1 microarchitectures (in particular on the AWS Graviton3 and SiPearl Rhea1 processors), we were able to show that using `INCx` SVE instructions to increment the loop counter can lead to noticeable performance degradation. Instead, it is possible to replace `INCx` by using a combination of `CNTx` to retrieve the SVE register's width in the loop prelude, and `ADD` to increment the offset in the loop (directly in place of `INCx`). This change can only be used reliably in paths where the whole vector is known to be valid, i.e., no elements in the register are masked. Conveniently, this also happens to be the critical path in most scenarios.
 
-These optimizations have specifically been tested on a AWS Graviton3 instance (Arm Neoverse V1 µarch) and have shown to yield compelling speedups on all modified routines for string sizes ranging from 32 KiB (half the size of the G3's L1d cache) to 256 MiB (8x the size of the G3's L3 cache). Detailed results are presented in the [Results](#results) section at the end of this README.
+The benchmarks presented here show that this change _never_ causes any performance regression compared to the current implementations in the [ARM-software/optimized-routines](https://github.com/ARM-software/optimized-routines)) repository.   
+This optimization has been tested on a AWS Graviton3 instance and, depending on the routine and buffer size, leads to performance improvements ranging from ~2% to ~46%.   
+Test string sizes range from 32 KiB (half the size of the Graviton3's L1 data cache), to 256 MiB (8x the size of its L3 cache). Detailed results are presented in the [Results](#results) section at the end of this README.
 
 
 ## Build & run
 
 ### Pre-requisites
 
+- CPU supporting the Arm SVE ISA extension
 - CMake 3.16
 - C11-conformant C compiler
 
@@ -28,12 +31,12 @@ cmake --build build
 
 ### Running
 
-All options can be listed with the following command:
+All program options can be listed with the following command:
 ```sh
 ./build/bench-sve-string-routines --help
 ```
 
-Run specific routines with their name as an option, e.g., for `memcmp` and `strcpy`:
+Run specific routines with their name as option, e.g., for `memcmp` and `strcpy`:
 ```sh
 ./build/bench-sve-string-routines --memcmp --strcpy
 ```
@@ -41,36 +44,56 @@ Run specific routines with their name as an option, e.g., for `memcmp` and `strc
 
 ## Benchmark methodology
 
-Our approach to benchmarking tries to be as straightforward, accurate, stable and reproducible as possible on different systems. All benchmark results presented in this repository were obtained on a AWS Graviton3 CPU (`c7g.medium` instance, on kernel `5.15.0-1051-aws` and using GCC 11.1.0).
+Our approach to benchmarking tries to be as straightforward, accurate, and reproducible as possible on different systems. All benchmark results presented in this repository were donce on a AWS Graviton3 CPU (`c7g.medium` instance, on kernel `5.15.0-1051-aws` and using GCC 11.1.0).
 
-For all routines, we tested the following buffer sizes:
-- 32 KiB, half of the Graviton's 3 L1D cache
-- 64 KiB, full L1D cache
-- 512 KiB, half L2 cache
-- 1 MiB, full L2 cache
-- 16 MiB, half L3 cache
-- 32 MiB, full L3 cache
-- 256 MiB, 8x L3 cache, guaranteed to be in DDR5 RAM
+For all routines, we used the following using test buffer sizes, initialized with random ASCII characters:
+- 32 KiB, half of the Graviton's 3 L1d$
+- 64 KiB, full L1d$
+- 512 KiB, half L2$
+- 1 MiB, full L2$
+- 16 MiB, half L3$
+- 32 MiB, full L3$
+- 256 MiB, 8x L3$, guaranteed to be in DDR5 RAM
 
-Each measurement is sampled 31 times, which guarantees an accurate representation of runtime performance, and runtime stability.   
-For small buffers, the execution time can be very short (less than 1 µs). In this case, the sampled execution time is obtained using an inner loop where the routine is called repeatedly and execution time is averaged over the number of repetitions.   
-In order to ensure that data buffers are in cache before running the actual benchmark, a few iterations of warmup calls a performed.   
-Peformance measurements are done using `clock_gettime` and the `CLOCK_MONOTONIC_RAW` clock, which offer an accurate resolution.
+Each measurement is sampled 31 times, which guarantees an accurate representation of runtime performance and stability.   
+For small buffers, the execution time can be very short (less than 1 µs). In this case, the sampled execution time is obtained using the averaged execution time of an inner loop where the routine is called repeatedly.   
+In order to ensure that data buffers are in cache before running the actual benchmark, a few iterations of warmup runs are performed.   
+Peformance measurements are done using `clock_gettime` and the `CLOCK_MONOTONIC_RAW` clock, which offers the most accurate resolution (up to a few nanoseconds).
 
 The general benchmarking algorithm is:
 ```
-FOR EACH w IN [0, warmup_count]:
-    CALL(routine)
-END
-
-FOR EACH s IN [0, sample_count]:
-    start <- clock_gettime()
-    FOR EACH r IN [0, repetitions_count]:
+INPUTS:
+  routine:           The routine implementation to benchmark.
+  warmup_count:      The number of warmup runs.
+  sample_count:      The number of sample measurements.
+  repetitions_count: The number of calls to average on per samples.
+──────────────────────────────────────────────────────────────────────────────────────────
+OUTPUT:
+  A list of statistical metrics for a given routine/buffer size combination.
+──────────────────────────────────────────────────────────────────────────────────────────
+VARIABLES:
+  start:     An instant in time which marks the start of the benchmarked code section.
+  stop:      An instant in time which marks the end of the benchmarked code section.
+  exec_time: The execution time for a given routine/buffer size combination.
+  samples:   A list of execution times for a given routine/buffer size
+             combination.
+──────────────────────────────────────────────────────────────────────────────────────────
+PROCEDURE benchmark_driver:
+    FOR EACH w IN [0, warmup_count]:
         CALL(routine)
     END
-    stop <- clock_gettime()
-    exec_time <- (stop - start) / repetitions_count
-    sample[s] <- exec_time
+
+    FOR EACH s IN [0, sample_count]:
+        start <- clock_gettime()
+        FOR EACH r IN [0, repetitions_count]:
+            CALL(routine)
+        END
+        stop <- clock_gettime()
+        exec_time <- (stop - start) / repetitions_count
+        sample[s] <- exec_time
+    END
+
+    RETURN bench_process(samples)
 END
 ```
 
