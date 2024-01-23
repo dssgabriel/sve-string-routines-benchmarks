@@ -16,26 +16,26 @@ def plot_bandwidth(input_file, output_file):
     df.columns = df.columns.str.strip()
 
     # Extract relevant columns
-    df = df[['BW GiB/s', 'BUF SIZE', 'ROUTINE IMPLEM', 'STD DEV %']]
+    df = df[['ROUTINE IMPLEMENTATION', 'BUF SIZE', 'BW AVG GiB/s', 'BW STDEV GiB/s']]
 
     # Create a new column for implementation type
-    df['Implementation'] = df['ROUTINE IMPLEM'].apply(lambda x: f'Current' if 'Current' in x else f'New')
-    df['Bandwidth (GiB/s)'] = df['BW GiB/s']
-    df['Err'] = df['STD DEV %'] / 100.0 * df['Bandwidth (GiB/s)']
+    df['Implementation'] = df['ROUTINE IMPLEMENTATION'].apply(lambda x: f'Current' if 'Current' in x else f'New')
+    # Rename BW column
+    df['Bandwidth (GiB/s)'] = df['BW AVG GiB/s']
 
     # Plot the grouped bar chart
     fig = px.bar(
         df,
         x='BUF SIZE',
         y='Bandwidth (GiB/s)',
-        error_y='Err',
+        error_y='BW STDEV GiB/s',
         color='Implementation',
         barmode='group',
         # text_auto=True,
         category_orders={'BUF SIZE': df['BUF SIZE'].unique()},
         labels={'BUF SIZE': 'String Buffer Size'},
-        title=f'<b>Comparative bandwidth performance of {routine_name}_aarch64_sve implementations</b>'
-            '<br><sup>on AWS Graviton3 (c7g.medium) — Higher is Better</sup>'
+        title=f'<b>Comparative bandwidth performance of `{routine_name}_aarch64_sve` implementations</b>'
+            '<br><sup>on AWS Graviton3E (hpc7g.16xlarge) — Higher is Better</sup>'
     )
 
     fig.update_traces(
