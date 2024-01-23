@@ -20,7 +20,7 @@ cmake_minimum_required(VERSION 3.16)
 project(bench-string-aarch64-sve
     LANGUAGES C ASM
     DESCRIPTION "Comparative benchmarks for alternate implementations of Arm SVE-optimized string routines"
-    VERSION 0.1.1
+    VERSION 0.2.0
 )
 
 set(CMAKE_BUILD_TYPE Release)
