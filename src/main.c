@@ -49,37 +49,37 @@ void bench_memcmp(size_t nbench, size_t const buf_sizes[nbench], size_t const be
     double samples_new[NSAMPLES] = { 0 };
 
     for (size_t b = 0; b < nbench; ++b) {
+        size_t actual_buf_sz = buf_sizes[b] / 2; // Because there are two strings
         // Benchmark initialization
         benchmark_t memcmp_bench = {
             .name_old = "Current `memcmp_sve`",
             .name_new = "New `memcmp_sve`",
             .nsamples = NSAMPLES,
             .nreps = bench_reps[b],
-            .buf_size = buf_sizes[b],
+            .buf_size = actual_buf_sz,
         };
 
         // Random char initialization
-        char* s1 = malloc(buf_sizes[b] + 1);
-        char* s2 = malloc(buf_sizes[b] + 1);
-        for (size_t c = 0; c < buf_sizes[b]; ++c) {
+        char* s1 = malloc(actual_buf_sz);
+        char* s2 = malloc(actual_buf_sz);
+        for (size_t c = 0; c < actual_buf_sz - 1; ++c) {
             s1[c] = (char)(rand() % 128);
             s2[c] = s1[c]; // Make data identical to avoid early function exit
         }
-        s1[buf_sizes[b]] = '\0';
-        s2[buf_sizes[b]] = '\0';
+        s1[actual_buf_sz - 1] = '\0';
+        s2[actual_buf_sz - 1] = '\0';
 
         // Warmup runs
         size_t const warmup_cnt = determine_warmup_cnt(bench_reps[b]);
         for (size_t i = 0; i < warmup_cnt; ++i) {
-            memcmp(s1, s2, buf_sizes[b]);
+            memcmp(s1, s2, actual_buf_sz);
         }
-
         // Run benchmark
         driver_memcmp(
-            NSAMPLES, bench_reps[b], samples_old, __memcmp_aarch64_sve, s1, s2, buf_sizes[b]
+            NSAMPLES, bench_reps[b], samples_old, __memcmp_aarch64_sve, s1, s2, actual_buf_sz
         );
         driver_memcmp(
-            NSAMPLES, bench_reps[b], samples_new, new_memcmp_aarch64_sve, s1, s2, buf_sizes[b]
+            NSAMPLES, bench_reps[b], samples_new, new_memcmp_aarch64_sve, s1, s2, actual_buf_sz
         );
 
         // Process and display results
@@ -107,19 +107,18 @@ void bench_strchr(size_t nbench, size_t const buf_sizes[nbench], size_t const be
         };
 
         // Random ASCII initialization
-        char* s = malloc(buf_sizes[b] + 1);
-        for (size_t c = 0; c < buf_sizes[b]; ++c) {
+        char* s = malloc(buf_sizes[b]);
+        for (size_t c = 0; c < buf_sizes[b] - 1; ++c) {
             s[c] = (char)(rand() % 95 + 32);
         }
-        s[buf_sizes[b]] = '\0';
+        s[buf_sizes[b] - 1] = '\0';
         int32_t c = 0; // Look for '\0'
 
         // Warmup runs
         size_t const warmup_cnt = determine_warmup_cnt(bench_reps[b]);
         for (size_t i = 0; i < warmup_cnt; ++i) {
-            strchr(s, c); // Use libc implem for warmup
+            strchr(s, c);
         }
-
         // Run benchmark
         driver_strchr(NSAMPLES, bench_reps[b], samples_old, __strchr_aarch64_sve, s, c);
         driver_strchr(NSAMPLES, bench_reps[b], samples_new, new_strchr_aarch64_sve, s, c);
@@ -138,31 +137,31 @@ void bench_strcmp(size_t nbench, size_t const buf_sizes[nbench], size_t const be
     double samples_new[NSAMPLES] = { 0 };
 
     for (size_t b = 0; b < nbench; ++b) {
+        size_t actual_buf_sz = buf_sizes[b] / 2; // Because there are two strings
         // Benchmark initialization
         benchmark_t strcmp_bench = {
             .name_old = "Current `strcmp_sve`",
             .name_new = "New `strcmp_sve`",
             .nsamples = NSAMPLES,
             .nreps = bench_reps[b],
-            .buf_size = buf_sizes[b],
+            .buf_size = actual_buf_sz,
         };
 
         // Random ASCII initialization
-        char* s1 = malloc(buf_sizes[b] + 1);
-        char* s2 = malloc(buf_sizes[b] + 1);
-        for (size_t c = 0; c < buf_sizes[b]; ++c) {
+        char* s1 = malloc(actual_buf_sz);
+        char* s2 = malloc(actual_buf_sz);
+        for (size_t c = 0; c < actual_buf_sz - 1; ++c) {
             s1[c] = (char)(rand() % 95 + 32);
             s2[c] = s1[c]; // Make strings identical to avoid early function exit
         }
-        s1[buf_sizes[b]] = '\0';
-        s2[buf_sizes[b]] = '\0';
+        s1[actual_buf_sz - 1] = '\0';
+        s2[actual_buf_sz - 1] = '\0';
 
         // Warmup runs
         size_t const warmup_cnt = determine_warmup_cnt(bench_reps[b]);
         for (size_t i = 0; i < warmup_cnt; ++i) {
             strcmp(s1, s2);
         }
-
         // Run benchmark
         driver_strcmp(NSAMPLES, bench_reps[b], samples_old, __strcmp_aarch64_sve, s1, s2);
         driver_strcmp(NSAMPLES, bench_reps[b], samples_new, new_strcmp_aarch64_sve, s1, s2);
@@ -182,30 +181,30 @@ void bench_strcpy(size_t nbench, size_t const buf_sizes[nbench], size_t const be
     double samples_new[NSAMPLES] = { 0 };
 
     for (size_t b = 0; b < nbench; ++b) {
+        size_t actual_buf_sz = buf_sizes[b] / 2; // Because there are two strings
         // Benchmark initialization
         benchmark_t strcpy_bench = {
             .name_old = "Current `strcpy_sve`",
             .name_new = "New `strcpy_sve`",
             .nsamples = NSAMPLES,
             .nreps = bench_reps[b],
-            .buf_size = buf_sizes[b],
+            .buf_size = actual_buf_sz,
         };
 
         // Random ASCII initialization
-        char* src = malloc(buf_sizes[b] + 1);
-        char* dst = malloc(buf_sizes[b] + 1);
-        for (size_t c = 0; c < buf_sizes[b]; ++c) {
+        char* src = malloc(actual_buf_sz);
+        char* dst = malloc(actual_buf_sz);
+        for (size_t c = 0; c < actual_buf_sz - 1; ++c) {
             src[c] = (char)(rand() % 95 + 32);
         }
-        src[buf_sizes[b]] = '\0';
-        dst[buf_sizes[b]] = '\0';
+        src[actual_buf_sz - 1] = '\0';
+        dst[actual_buf_sz - 1] = '\0';
 
         // Warmup runs
         size_t const warmup_cnt = determine_warmup_cnt(bench_reps[b]);
         for (size_t i = 0; i < warmup_cnt; ++i) {
             strcpy(dst, src);
         }
-
         // Run benchmark
         driver_strcpy(NSAMPLES, bench_reps[b], samples_old, __strcpy_aarch64_sve, dst, src);
         driver_strcpy(NSAMPLES, bench_reps[b], samples_new, new_strcpy_aarch64_sve, dst, src);
@@ -235,18 +234,17 @@ void bench_strlen(size_t nbench, size_t const buf_sizes[nbench], size_t const be
         };
 
         // Random ASCII initialization
-        char* s = malloc(buf_sizes[b] + 1);
-        for (size_t c = 0; c < buf_sizes[b]; ++c) {
+        char* s = malloc(buf_sizes[b]);
+        for (size_t c = 0; c < buf_sizes[b] - 1; ++c) {
             s[c] = (char)(rand() % 95 + 32);
         }
-        s[buf_sizes[b]] = '\0';
+        s[buf_sizes[b] - 1] = '\0';
 
         // Warmup runs
         size_t const warmup_cnt = determine_warmup_cnt(bench_reps[b]);
         for (size_t i = 0; i < warmup_cnt; ++i) {
             strlen(s);
         }
-
         // Run benchmark
         driver_strlen(NSAMPLES, bench_reps[b], samples_old, __strlen_aarch64_sve, s);
         driver_strlen(NSAMPLES, bench_reps[b], samples_new, new_strlen_aarch64_sve, s);
@@ -265,37 +263,37 @@ void bench_strncmp(size_t nbench, size_t const buf_sizes[nbench], size_t const b
     double samples_new[NSAMPLES] = { 0 };
 
     for (size_t b = 0; b < nbench; ++b) {
+        size_t actual_buf_sz = buf_sizes[b] / 2; // Because there are two strings
         // Benchmark initialization
         benchmark_t strncmp_bench = {
             .name_old = "Current `strncmp_sve`",
             .name_new = "New `strncmp_sve`",
             .nsamples = NSAMPLES,
             .nreps = bench_reps[b],
-            .buf_size = buf_sizes[b],
+            .buf_size = actual_buf_sz,
         };
 
         // Random ASCII initialization
-        char* s1 = malloc(buf_sizes[b] + 1);
-        char* s2 = malloc(buf_sizes[b] + 1);
-        for (size_t c = 0; c < buf_sizes[b]; ++c) {
+        char* s1 = malloc(actual_buf_sz);
+        char* s2 = malloc(actual_buf_sz);
+        for (size_t c = 0; c < actual_buf_sz - 1; ++c) {
             s1[c] = (char)(rand() % 95 + 32);
             s2[c] = s1[c]; // Make strings identical to avoid early function exit
         }
-        s1[buf_sizes[b]] = '\0';
-        s2[buf_sizes[b]] = '\0';
+        s1[actual_buf_sz - 1] = '\0';
+        s2[actual_buf_sz - 1] = '\0';
 
         // Warmup runs
         size_t const warmup_cnt = determine_warmup_cnt(bench_reps[b]);
         for (size_t i = 0; i < warmup_cnt; ++i) {
-            strncmp(s1, s2, buf_sizes[b]);
+            strncmp(s1, s2, actual_buf_sz);
         }
-
         // Run benchmark
         driver_strncmp(
-            NSAMPLES, bench_reps[b], samples_old, __strncmp_aarch64_sve, s1, s2, buf_sizes[b]
+            NSAMPLES, bench_reps[b], samples_old, __strncmp_aarch64_sve, s1, s2, actual_buf_sz
         );
         driver_strncmp(
-            NSAMPLES, bench_reps[b], samples_new, new_strncmp_aarch64_sve, s1, s2, buf_sizes[b]
+            NSAMPLES, bench_reps[b], samples_new, new_strncmp_aarch64_sve, s1, s2, actual_buf_sz
         );
 
         // Process and display results
@@ -323,18 +321,17 @@ void bench_strnlen(size_t nbench, size_t const buf_sizes[nbench], size_t const b
         };
 
         // Random ASCII initialization
-        char* s = malloc(buf_sizes[b] + 1);
-        for (size_t c = 0; c < buf_sizes[b]; ++c) {
+        char* s = malloc(buf_sizes[b]);
+        for (size_t c = 0; c < buf_sizes[b] - 1; ++c) {
             s[c] = (char)(rand() % 95 + 32);
         }
-        s[buf_sizes[b]] = '\0';
+        s[buf_sizes[b] - 1] = '\0';
 
         // Warmup runs
         size_t const warmup_cnt = determine_warmup_cnt(bench_reps[b]);
         for (size_t i = 0; i < warmup_cnt; ++i) {
             strnlen(s, buf_sizes[b]);
         }
-
         // Run benchmark
         driver_strnlen(
             NSAMPLES, bench_reps[b], samples_old, __strnlen_aarch64_sve, s, buf_sizes[b]
@@ -367,11 +364,11 @@ void bench_strrchr(size_t nbench, size_t const buf_sizes[nbench], size_t const b
         };
 
         // Random ASCII initialization
-        char* s = malloc(buf_sizes[b] + 1);
-        for (size_t c = 0; c < buf_sizes[b]; ++c) {
+        char* s = malloc(buf_sizes[b]);
+        for (size_t c = 0; c < buf_sizes[b] - 1; ++c) {
             s[c] = (char)(rand() % 95 + 32);
         }
-        s[buf_sizes[b]] = '\0';
+        s[buf_sizes[b] - 1] = '\0';
         int32_t c = 0; // Look for '\0'
 
         // Warmup runs
@@ -379,7 +376,6 @@ void bench_strrchr(size_t nbench, size_t const buf_sizes[nbench], size_t const b
         for (size_t i = 0; i < warmup_cnt; ++i) {
             strrchr(s, c);
         }
-
         // Run benchmark
         driver_strrchr(NSAMPLES, bench_reps[b], samples_old, __strrchr_aarch64_sve, s, c);
         driver_strrchr(NSAMPLES, bench_reps[b], samples_new, new_strrchr_aarch64_sve, s, c);
@@ -397,9 +393,9 @@ int32_t main(int32_t argc, char* argv[argc + 1]) {
     // Feel free to add additional sizes here
     size_t const buf_sizes[] = { HALF_L1D, FULL_L1D, HALF_L2, FULL_L2, HALF_L3, FULL_L3, DRAM };
     // Don't forget to add appropriate benchmark repetitions here too
-    size_t const bench_reps[] = { 500, 100, 50, 10, 5, 1, 1 };
+    size_t const bench_reps[] = { 500, 100, 50, 10, 5, 3, 1 };
     size_t const nbench = sizeof(buf_sizes) / sizeof(buf_sizes[0]);
-
+    // Safety check
     assert(
         sizeof(buf_sizes) == sizeof(bench_reps)
         && "Number of buffer sizes and bench repetitions don't match"

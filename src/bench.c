@@ -31,24 +31,43 @@ void bench_process(
     benchmark_t self[static 1], size_t nsamples, double old[nsamples], double new[nsamples]
 ) {
     qsort(old, nsamples, sizeof(double), cmp_double);
-    self->stats_old.min = old[0];
-    self->stats_old.med = old[nsamples / 2 + 1];
-    self->stats_old.max = old[nsamples - 1];
-    self->stats_old.avg = mean(nsamples, old);
-    self->stats_old.err = stddev(nsamples, old, self->stats_old.avg) * 100.0 / self->stats_old.avg;
-
     qsort(new, nsamples, sizeof(double), cmp_double);
-    self->stats_new.min = new[0];
-    self->stats_new.med = new[nsamples / 2 + 1];
-    self->stats_new.max = new[nsamples - 1];
-    self->stats_new.avg = mean(nsamples, new);
-    self->stats_new.err = stddev(nsamples, new, self->stats_new.avg) * 100.0 / self->stats_new.avg;
+    self->rt_old.min = old[0];
+    self->rt_old.med = old[nsamples / 2 + 1];
+    self->rt_old.max = old[nsamples - 1];
+    self->rt_old.avg = mean(nsamples, old);
+    self->rt_old.err = stddev(nsamples, old, self->rt_old.avg) * 100.0 / self->rt_old.avg;
+    self->rt_new.min = new[0];
+    self->rt_new.med = new[nsamples / 2 + 1];
+    self->rt_new.max = new[nsamples - 1];
+    self->rt_new.avg = mean(nsamples, new);
+    self->rt_new.err = stddev(nsamples, new, self->rt_new.avg) * 100.0 / self->rt_new.avg;
+    self->rt_speedup = self->rt_old.avg / self->rt_new.avg;
 
-    self->speedup = self->stats_old.avg / self->stats_new.avg;
+    double bw_old[nsamples];
+    double bw_new[nsamples];
+    double buf_size_gib = (double)self->buf_size / ONE_GIB;
+    for (size_t i = 0; i < nsamples; ++i) {
+        bw_old[i] = buf_size_gib / ns_to_s(old[i]);
+        bw_new[i] = buf_size_gib / ns_to_s(new[i]);
+    }
+    qsort(bw_old, nsamples, sizeof(double), cmp_double);
+    qsort(bw_new, nsamples, sizeof(double), cmp_double);
+    self->bw_old.min = bw_old[0];
+    self->bw_old.med = bw_old[nsamples / 2 + 1];
+    self->bw_old.max = bw_old[nsamples - 1];
+    self->bw_old.avg = mean(nsamples, bw_old);
+    self->bw_old.err = stddev(nsamples, bw_old, self->bw_old.avg);
+    self->bw_new.min = bw_new[0];
+    self->bw_new.med = bw_new[nsamples / 2 + 1];
+    self->bw_new.max = bw_new[nsamples - 1];
+    self->bw_new.avg = mean(nsamples, bw_new);
+    self->bw_new.err = stddev(nsamples, bw_new, self->bw_new.avg);
+    self->bw_speedup = 1.0 / (self->bw_old.avg / self->bw_new.avg);
 }
 
 static inline void print_line() {
-    for (size_t i = 0; i < 17 * 4 + 14 * 4 + 25; ++i) { printf("-"); }
+    for (size_t i = 0; i < 17 * 7 + 14 * 2 + 25; ++i) { printf("-"); }
     printf("\n");
 }
 
@@ -56,16 +75,11 @@ void bench_print(benchmark_t const self[static 1]) {
     static bool header = false;
     if (!header) {
         printf(
-            "%24s |%12s |%15s |%15s |%15s |%15s |%12s |%12s |%12s\n",
-            "ROUTINE IMPLEM",
-            "BUF SIZE",
-            "MINIMUM ns",
-            "MEDIAN ns",
-            "MAXIMUM ns",
-            "AVERAGE ns",
-            "STD DEV %",
-            "BW GiB/s",
-            "SPEEDUP %"
+            "%24s |%12s |%15s |%15s |%15s |%15s |%15s |%15s |%15s |%12s\n",
+            "ROUTINE IMPLEMENTATION", "BUF SIZE",
+            "RT MIN ns", "RT MED ns", "RT MAX ns", "RT AVG ns", "RT STDEV %",
+            "BW AVG GiB/s", "BW STDEV GiB/s",
+            "SPEEDUP"
         );
         header = true;
     }
@@ -84,26 +98,16 @@ void bench_print(benchmark_t const self[static 1]) {
     fmt_array_size[12] = '\0';
 
     printf(
-        "%24s |%12s |%15.0lf |%15.0lf |%15.0lf |%15.3lf |%12.3lf |%12.3lf |\n",
-        self->name_old,
-        fmt_array_size,
-        self->stats_old.min,
-        self->stats_old.med,
-        self->stats_old.max,
-        self->stats_old.avg,
-        self->stats_old.err,
-        ((double)self->buf_size / ONE_GIB) / ns_to_s(self->stats_old.avg)
+        "%24s |%12s |%15.0lf |%15.0lf |%15.0lf |%15.3lf |%15.3lf |%15.3lf |%15.3lf |\n",
+        self->name_old, fmt_array_size,
+        self->rt_old.min, self->rt_old.med, self->rt_old.max, self->rt_old.avg, self->rt_old.err,
+        self->bw_old.avg, self->bw_old.err
     );
     printf(
-        "%24s |%12s |%15.0lf |%15.0lf |%15.0lf |%15.3lf |%12.3lf |%12.3lf |%+11.2lf%%\n",
-        self->name_new,
-        fmt_array_size,
-        self->stats_new.min,
-        self->stats_new.med,
-        self->stats_new.max,
-        self->stats_new.avg,
-        self->stats_new.err,
-        ((double)self->buf_size / ONE_GIB) / ns_to_s(self->stats_new.avg),
-        (self->speedup - 1.0) * 100.0
+        "%24s |%12s |%15.0lf |%15.0lf |%15.0lf |%15.3lf |%15.3lf |%15.3lf |%15.3lf |%+11.2lf%%\n",
+        self->name_new, fmt_array_size,
+        self->rt_new.min, self->rt_new.med, self->rt_new.max, self->rt_new.avg, self->rt_new.err,
+        self->bw_new.avg, self->bw_new.err,
+        (self->rt_speedup - 1.0) * 100.0
     );
 }

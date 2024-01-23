@@ -29,12 +29,18 @@ typedef struct benchmark_s {
     char name_old[32];
     /// Name of the new implementation.
     char name_new[32];
-    /// Statistics for the old implementation.
-    statistics_t stats_old;
-    /// Statistics for the new implementation.
-    statistics_t stats_new;
-    /// Speedup of new over old.
-    double speedup;
+    /// Runtime statistics for the old implementation.
+    statistics_t rt_old;
+    /// Runtime statistics for the new implementation.
+    statistics_t rt_new;
+    /// Bandwidth statistics of the old implementation.
+    statistics_t bw_old;
+    /// Bandwidth statistics of the new implementation.
+    statistics_t bw_new;
+    /// Runtime speedup of new over old.
+    double rt_speedup;
+    /// Bandwidth speedup of new over old.
+    double bw_speedup;
     /// Buffer size used.
     size_t buf_size;
     /// Number of samples.
