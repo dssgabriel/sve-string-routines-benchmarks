@@ -5,13 +5,13 @@
 
 This repository benchmarks the current implementations of some AArch64 SVE string routines from [Arm's optimized-routines library](https://github.com/ARM-software/optimized-routines) against newly proposed implementations.
 
-This effort was carried out as part of the [EMOPASS]() European Project and conducted at the Laboratory of Parallelism and Distributed Algorithm Networks (LI-PaRAD) of the [University of Versailles Saint-Quentin-en-Yvelines](https://www.uvsq.fr/english) (UVSQ — Paris-Saclay University), in collaboration with industrial partners: [SiPearl](https://sipearl.com/en) and [Eviden](https://eviden.com/).
+This effort was carried out as part of the EMOPASS European Project and conducted at the Laboratory of Parallelism and Distributed Algorithm Networks (LI-PaRAD) of the [University of Versailles Saint-Quentin-en-Yvelines](https://www.uvsq.fr/english) (UVSQ — Paris-Saclay University), in collaboration with industrial partners: [SiPearl](https://sipearl.com/en) and [Eviden](https://eviden.com/).
 
 In the context of benchmarking the performance of HPC applications on Arm Neoverse V1 microarchitectures (in particular on the AWS Graviton3/Graviton3E and SiPearl Rhea processors), we have shown that using `INCx` SVE instructions to increment the loop offset can lead to noticeable performance degradation. Instead of using `INCx`, it is possible to replace it with a combination of `CNTx` to retrieve the SVE register's width in the loop prelude, and `ADD` to increment the offset in the loop (directly in the place of `INCx`). This change is only used in paths where the whole vector is known to be valid, i.e., no elements in the register are masked using a predicate. Conveniently, this also happens to be the critical path in most scenarios.
 
 The benchmarks presented here show that this change _never_ causes any performance regression compared to the current implementations in the [ARM-software/optimized-routines](https://github.com/ARM-software/optimized-routines) repository.   
-This optimization has been tested on AWS Graviton3 and Graviton3E instances and, depending on the routine and buffer size, achieves performance improvements up to 45%.   
-Test string sizes range from 32 KiB (half the size of the Graviton3's L1 data cache), to 256 MiB (8x the size of its L3 cache). Detailed results are presented in the [Results](#results) section at the end of this README.
+This optimization has been tested on AWS Graviton3 and Graviton3E instances< Depending on the routine and buffer size, it achieves performance improvements of over 45%.   
+Test string sizes range from 32 KiB (half the size of the Graviton3's L1 data cache) to 256 MiB (8x the size of its L3 cache). Detailed results are presented in the [Results](#results) section at the end of this README.
 
 
 ## Build & run
@@ -44,7 +44,7 @@ Run specific routines with their name as option, e.g., for `memcmp` and `strcpy`
 
 ## Benchmark methodology
 
-Our approach to benchmarking tries to be as straightforward, accurate, and reproducible as possible on different systems. All benchmark results presented in this repository were obtained on a AWS Graviton3E CPU (`hpc7g.16xlarge` instance, on kernel `5.10.179-171.711.amzn2.aarch64`, and compiled with GCC 12.2.0 and/or ACFL 23.10).
+Our approach to benchmarking tries to be as straightforward, accurate, and reproducible as possible on different systems. All benchmark results presented in this repository were obtained on an AWS Graviton3E CPU (`hpc7g.16xlarge` instance, on kernel `5.10.179-171.711.amzn2.aarch64`, and compiled with GCC 12.2.0/ACFL 23.10).
 
 We benchmarked each routine with the following (total) memory sizes:
 - 32 KiB (half of the Graviton's 3 L1d cache)
@@ -53,11 +53,11 @@ We benchmarked each routine with the following (total) memory sizes:
 - 1 MiB (full L2 cache)
 - 16 MiB (half L3 cache)
 - 32 MiB (full L3 cache)
-- 256 MiB (8x L3 cache, guaranteed to be in DDR5 RAM)
+- 256 MiB (8x L3 cache, guaranteed to spill in DDR5 RAM)
 
 These specific sizes allow us to showcase the routines' behavior in two main scenarios:
 1. using half the cache size guarantees that the data should always fit in a given cache level;
-2. using the full cache size means there is higher likelyhood that some of the data spills in a higher cache level (and thus, may reduce performance).
+2. using the full cache size means there is a higher likelihood that some of the data spill in a higher cache level (and thus, may negatively impact performance).
 
 For routines that manipulate two strings (`memcmp`, `strcmp`, `strcpy` and `strncmp`), their length was divided by two to ensure that the sum of buffer sizes does not exceed the target memory footprint.
 All strings are initialized with random ASCII characters, and a null terminator is inserted at the end to ensure that routines must process the entire buffer to run to completion.
@@ -65,7 +65,7 @@ All strings are initialized with random ASCII characters, and a null terminator 
 Each measurement is sampled 31 times, which offers an accurate representation of runtime performance and stability.   
 For smaller buffers, the execution time can be very short. In this case, the sampled execution time is obtained using the average runtime of an inner loop where the routine is called repeatedly.   
 In order to ensure that data buffers are in cache before running the actual benchmark, a few iterations of warmup runs are performed.   
-Peformance measurements are done using `clock_gettime` and the `CLOCK_MONOTONIC_RAW` clock, which provides a highly accurate resolution (up to the nanosecond scale).
+Performance measurements are done using `clock_gettime` and the `CLOCK_MONOTONIC_RAW` clock, which provides a highly accurate resolution (up to the nanosecond scale).
 
 The general benchmarking algorithm is:
 ```
@@ -73,14 +73,14 @@ INPUTS:
   routine:           The routine implementation to benchmark.
   warmup_count:      The number of warmup runs.
   sample_count:      The number of sample measurements.
-  repetitions_count: The number of calls to average on per samples.
+  repetitions_count: The number of calls to repeat per sample.
 ──────────────────────────────────────────────────────────────────────────────────────────
 OUTPUT:
   A list of statistical metrics for a given routine/buffer size combination.
 ──────────────────────────────────────────────────────────────────────────────────────────
 VARIABLES:
-  start:     An instant in time which marks the start of the benchmarked code section.
-  stop:      An instant in time which marks the end of the benchmarked code section.
+  start:     An instant in time that marks the start of the benchmarked code section.
+  stop:      An instant in time that marks the end of the benchmarked code section.
   exec_time: The execution time for a given routine/buffer size combination.
   samples:   A list of execution times for a given routine/buffer size
              combination.
@@ -120,7 +120,7 @@ The raw results are available in the [`results/raw`](https://github.com/dssgabri
 - percentage of runtime standard deviation
 - average bandwidth (in GiB/s)
 - bandwidth standard deviation (in GiB/s)
-- speedup (as percentage of performance improvement)
+- speedup (as a percentage of performance improvement)
 
 The following is the raw result output for the `strcpy` routine:
 ```
@@ -156,9 +156,9 @@ python scripts/plot_by.py --input results/raw/strcpy.dat --output results/plots/
 
 ### Observations
 
-The optimization presented here _always_ yields better performance than the current implementation. Replacing `INCx` with `CNTx` and `ADD` is equivalent to hoisting the retrieval of the SVE register's width out of the loop, the only "penalty" being that it requires an additional register. This means that such an optimization should not produce slowdowns on other SVE-supporting microarchitectures (e.g., for embedded hardware or Neoverse V2) and should therefore be safe to merge.
+Replacing `INCx` with `CNTx` and `ADD` is equivalent to hoisting the retrieval of the SVE register's width out of the loop, the only "penalty" being that it requires an additional register. This means that such optimization should not produce slowdowns on other SVE-supporting microarchitectures (e.g., for embedded hardware, A64FX, Neoverse V2, etc...) and should therefore be safe to merge.
 
-The performance gap is generally higher for data that fits in the L1 or L2 cache, when the memory load's latency is small and exacerbates the slowdown incured by `INCx`. For larger strings, that fit in L3 or in RAM, fetching the data takes significantly more time, which partially hides the improvement obtained by replacing `INCx` instructions.
+The performance gap is generally higher for data that fits in the L1 or L2 cache when the memory load's latency is small and exacerbates the slowdown incurred by `INCx`. For larger strings, that fit in L3 or in RAM, fetching the data takes significantly more time, which partially hides the improvement obtained by replacing `INCx` instructions.
 
 ### Bandwidth plots
 
