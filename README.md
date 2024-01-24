@@ -151,7 +151,7 @@ The following is the raw result output for the `strcpy` routine:
 Plots summarizing these results for each routine can be found in the  [`results/plots`](https://github.com/dssgabriel/sve-string-routines-benchmarks/blob/main/results/plots/) directory, as well as at the end of this README.   
 They can also be (re-)generated using the `script/plot_bw.py` Python script:
 ```sh
-python scripts/plot_by.py --input results/raw/strcpy.dat --output results/plots/strcpy.png
+python scripts/plot_bw.py --input results/raw/strcpy.dat --output results/plots/strcpy.png
 ```
 
 ### Observations
@@ -162,7 +162,8 @@ The performance gap is generally higher for data that fits in the L1 or L2 cache
 
 ### Bandwidth plots
 
-The following plots (generated with the `scripts/plot.py` Python script) present the comparative bandwidth performance between implementations for each routine, with the current implementation in blue, and our optimized version in red:
+The following plots present the comparative bandwidth performance between implementations for each routine, with the current implementation in blue, and our optimized version in red:
+
 ![Comparative bandwidth performance for `memcmp_aarch64_sve` implementations](https://github.com/dssgabriel/sve-string-routines-benchmarks/blob/main/results/plots/memcmp.png)
 
 ![Comparative bandwidth performance for `strchr_aarch64_sve` implementations](https://github.com/dssgabriel/sve-string-routines-benchmarks/blob/main/results/plots/strchr.png)
