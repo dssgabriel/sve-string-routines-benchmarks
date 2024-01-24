@@ -27,26 +27,45 @@ def plot_bandwidth(input_file, output_file):
     fig = px.bar(
         df,
         x='BUF SIZE',
-        y='Bandwidth (GiB/s)',
+        y='BW AVG GiB/s',
         error_y='BW STDEV GiB/s',
         color='Implementation',
         barmode='group',
         # text_auto=True,
         category_orders={'BUF SIZE': df['BUF SIZE'].unique()},
-        labels={'BUF SIZE': 'String Buffer Size'},
         title=f'<b>Comparative bandwidth performance of `{routine_name}_aarch64_sve` implementations</b>'
-            '<br><sup>on AWS Graviton3E (hpc7g.16xlarge) — Higher is Better</sup>'
-    )
-
-    fig.update_traces(
-        textposition='outside'
+            '<br><sup>on AWS Graviton3E (hpc7g.16xlarge)</sup>'
     )
 
     # Set the resolution of the figure
     fig.update_layout(
         font=dict(size=20),
         width=1280, height=960,
-        yaxis=dict(tickmode='linear', dtick=2.5)
+        yaxis=dict(tickmode='linear', dtick=1 if df['BW AVG GiB/s'].max() <= 10 else 2),
+        xaxis_title="<b>String buffer size</b>",
+        yaxis_title="<b>Bandwidth (in GiB/s)</b>",
+        legend=dict(
+            font=dict(size=24),
+            title="<b>Implementation</b>",
+            yanchor="bottom",
+            y=0.01,
+            xanchor="left",
+            x=0.01,
+            borderwidth=8,
+            bordercolor='white'
+        )
+    )
+
+    fig.add_annotation(
+        font=dict(size=22),
+        x=0.424,
+        y=0.03,
+        text="<b>Higher is Better</b>",
+        bgcolor='white',
+        borderwidth=8,
+        xanchor='left',
+        xref="paper",
+        yref="paper"
     )
 
     # Save the plot
