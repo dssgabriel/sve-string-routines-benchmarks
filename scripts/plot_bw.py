@@ -4,9 +4,23 @@ import plotly.express as px
 import os
 
 
-def plot_bandwidth(input_file, output_file):
-    # Retrieve routine name from the input file name
-    routine_name = os.path.splitext(os.path.basename(input_file))[0]
+def plot_bandwidth(args):
+    input_file = args.input
+    output_file = args.output
+    routine_name = args.routine
+    match args.target:
+        case "G3":
+            target_hardware = "AWS Graviton3"
+        case "G3E":
+            target_hardware = "AWS Graviton3E"
+        case "A64FX":
+            target_hardware = "Fujitsu A64FX"
+        case "Grace":
+            target_hardware = "NVIDIA Grace"
+        case "Rhea1":
+            target_hardware = "SiPearl Rhea1"
+        case _:
+            target_hardware = "unknown hardware"
     
     # Convert CSV data to DataFrame
     df = pd.read_csv(input_file, sep='|', skipinitialspace=True, skiprows=lambda x: x == 1 or x % 3 == 1)
@@ -16,31 +30,31 @@ def plot_bandwidth(input_file, output_file):
     df.columns = df.columns.str.strip()
 
     # Extract relevant columns
-    df = df[['ROUTINE IMPLEMENTATION', 'BUF SIZE', 'BW AVG GiB/s', 'BW STDEV GiB/s']]
+    df = df[['ROUTINE IMPLEMENTATION', 'BUF SIZE B', 'BW AVG GiB/s', 'BW STDEV GiB/s']]
 
     # Create a new column for implementation type
-    df['Implementation'] = df['ROUTINE IMPLEMENTATION'].apply(lambda x: f'Current' if 'Current' in x else f'New')
+    df['Implementation'] = df['ROUTINE IMPLEMENTATION'].apply(lambda x: x if 'Current' in x else f'Ours')
     # Rename BW column
-    df['Bandwidth (GiB/s)'] = df['BW AVG GiB/s']
+    df['Average bandwidth (GiB/s)'] = df['BW AVG GiB/s']
 
     # Plot the grouped bar chart
     fig = px.bar(
         df,
-        x='BUF SIZE',
+        x='BUF SIZE B',
         y='BW AVG GiB/s',
         error_y='BW STDEV GiB/s',
         color='Implementation',
         barmode='group',
         # text_auto=True,
-        category_orders={'BUF SIZE': df['BUF SIZE'].unique()},
-        title=f'<b>Comparative bandwidth performance of `{routine_name}_aarch64_sve` implementations</b>'
-            '<br><sup>on AWS Graviton3E (hpc7g.16xlarge)</sup>'
+        category_orders={'BUF SIZE B': df['BUF SIZE B'].unique()},
+        title=f'<b>Comparative bandwidth performance of `{routine_name}` implementations</b>'
+            f'<br><sup>on {target_hardware}</sup>'
     )
 
     # Set the resolution of the figure
     fig.update_layout(
         font=dict(size=20),
-        width=1280, height=960,
+        width=2560, height=1080,
         yaxis=dict(tickmode='linear', dtick=1 if df['BW AVG GiB/s'].max() <= 10 else 2),
         xaxis_title="<b>String buffer size</b>",
         yaxis_title="<b>Bandwidth (in GiB/s)</b>",
@@ -49,8 +63,8 @@ def plot_bandwidth(input_file, output_file):
             title="<b>Implementation</b>",
             yanchor="bottom",
             y=0.01,
-            xanchor="left",
-            x=0.01,
+            xanchor="right",
+            x=0.99,
             borderwidth=8,
             bordercolor='white'
         )
@@ -58,7 +72,7 @@ def plot_bandwidth(input_file, output_file):
 
     fig.add_annotation(
         font=dict(size=22),
-        x=0.424,
+        x=0.45,
         y=0.03,
         text="<b>Higher is Better</b>",
         bgcolor='white',
@@ -73,8 +87,14 @@ def plot_bandwidth(input_file, output_file):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate a bar plot of bandwidth over buffer sizes.")
-    parser.add_argument("-i", "--input", help="Input CSV file name", required=True)
-    parser.add_argument("-o", "--output", help="Output file name for the plot", required=True)
+    parser.add_argument("-i", dest="input", help="Input CSV file name", required=True)
+    parser.add_argument("-o", dest="output", help="Output file name for the plot")
+    parser.add_argument("-r", dest="routine", choices=["memcpy", "strcpy", "strncpy", "memcmp", "strcmp", "strncmp", "strchr", "strrchr", "strlen", "strnlen"], help="Routine name", required=True)
+    parser.add_argument("-c", dest="implem", choices=["libc", "aor"], help="Implementation being compared to", required=True)
+    parser.add_argument("-t", dest="target", choices=["G3", "G3E", "A64FX", "Grace", "Rhea1"], help="Target hardware")
     args = parser.parse_args()
 
-    plot_bandwidth(args.input, args.output)
+    if not args.output:
+        os.path.join(os.getcwd(), os.listdir(os.getcwd())[0])
+        args.output = "results/plots/" + os.path.basename(os.path.splitext(args.input)[0]) + ".png"
+    plot_bandwidth(args)
