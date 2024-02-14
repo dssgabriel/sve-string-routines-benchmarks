@@ -51,6 +51,9 @@
 #    endif
 #endif
 
+#define xstr(s) str(s)
+#define str(s) #s
+
 static inline size_t determine_warmup_cnt(size_t bench_reps) {
     return bench_reps > 10 ? bench_reps / 10 : 1;
 }
@@ -62,8 +65,12 @@ void bench_memcmp(size_t nbench, size_t const buf_sizes[nbench], size_t const be
     for (size_t b = 0; b < nbench; ++b) {
         // Benchmark initialization
         benchmark_t memcmp_bench = {
-            .name_old = "Current `memcmp_sve`",
-            .name_new = "New `memcmp_sve`",
+#ifdef CMP_LIBC
+            .name_old = "memcmp (GNU libc " xstr(__GLIBC__) "." xstr(__GLIBC_MINOR__),
+#else
+            .name_old = "memcmp (Arm optimized-routines)",
+#endif
+            .name_new = "memcmp (LI-PaRAD/EMOPASS)",
             .nsamples = NSAMPLES,
             .nreps = bench_reps[b],
             .buf_size = buf_sizes[b],
@@ -121,8 +128,12 @@ void bench_memcpy(size_t nbench, size_t const buf_sizes[nbench], size_t const be
     for (size_t b = 0; b < nbench; ++b) {
         // Benchmark initialization
         benchmark_t memcpy_bench = {
-            .name_old = "Current `memcpy_sve`",
-            .name_new = "New `memcpy_sve`",
+#ifdef CMP_LIBC
+            .name_old = "memcpy" xstr(__GLIBC__) "." xstr(__GLIBC_MINOR__),
+#else
+            .name_old = "memcpy (Arm optimized-routines)",
+#endif
+            .name_new = "memcpy (LI-PaRAD/EMOPASS)",
             .nsamples = NSAMPLES,
             .nreps = bench_reps[b],
             .buf_size = buf_sizes[b],
@@ -177,8 +188,12 @@ void bench_strcmp(size_t nbench, size_t const buf_sizes[nbench], size_t const be
     for (size_t b = 0; b < nbench; ++b) {
         // Benchmark initialization
         benchmark_t strcmp_bench = {
-            .name_old = "Current `strcmp_sve`",
-            .name_new = "New `strcmp_sve`",
+#ifdef CMP_LIBC
+            .name_old = "strcmp" xstr(__GLIBC__) "." xstr(__GLIBC_MINOR__),
+#else
+            .name_old = "strcmp (Arm optimized-routines)",
+#endif
+            .name_new = "strcmp (LI-PaRAD/EMOPASS)",
             .nsamples = NSAMPLES,
             .nreps = bench_reps[b],
             .buf_size = buf_sizes[b],
@@ -232,8 +247,12 @@ void bench_strncmp(size_t nbench, size_t const buf_sizes[nbench], size_t const b
     for (size_t b = 0; b < nbench; ++b) {
         // Benchmark initialization
         benchmark_t strncmp_bench = {
-            .name_old = "Current `strncmp_sve`",
-            .name_new = "New `strncmp_sve`",
+#ifdef CMP_LIBC
+            .name_old = "strncmp" xstr(__GLIBC__) "." xstr(__GLIBC_MINOR__),
+#else
+            .name_old = "strncmp (Arm optimized-routines)",
+#endif
+            .name_new = "strncmp (LI-PaRAD/EMOPASS)",
             .nsamples = NSAMPLES,
             .nreps = bench_reps[b],
             .buf_size = buf_sizes[b],
@@ -292,8 +311,12 @@ void bench_strchr(size_t nbench, size_t const buf_sizes[nbench], size_t const be
     for (size_t b = 0; b < nbench; ++b) {
         // Benchmark initialization
         benchmark_t strchr_bench = {
-            .name_old = "Current `strchr_sve`",
-            .name_new = "New `strchr_sve`",
+#ifdef CMP_LIBC
+            .name_old = "strchr" xstr(__GLIBC__) "." xstr(__GLIBC_MINOR__),
+#else
+            .name_old = "strchr (Arm optimized-routines)",
+#endif
+            .name_new = "strchr (LI-PaRAD/EMOPASS)",
             .nsamples = NSAMPLES,
             .nreps = bench_reps[b],
             .buf_size = buf_sizes[b],
@@ -344,8 +367,12 @@ void bench_strrchr(size_t nbench, size_t const buf_sizes[nbench], size_t const b
     for (size_t b = 0; b < nbench; ++b) {
         // Benchmark initialization
         benchmark_t strrchr_bench = {
-            .name_old = "Current `strrchr_sve`",
-            .name_new = "New `strrchr_sve`",
+#ifdef CMP_LIBC
+            .name_old = "strrchr" xstr(__GLIBC__) "." xstr(__GLIBC_MINOR__),
+#else
+            .name_old = "strrchr (Arm optimized-routines)",
+#endif
+            .name_new = "strrchr (LI-PaRAD/EMOPASS)",
             .nsamples = NSAMPLES,
             .nreps = bench_reps[b],
             .buf_size = buf_sizes[b],
@@ -396,8 +423,12 @@ void bench_strcpy(size_t nbench, size_t const buf_sizes[nbench], size_t const be
     for (size_t b = 0; b < nbench; ++b) {
         // Benchmark initialization
         benchmark_t strcpy_bench = {
-            .name_old = "Current `strcpy_sve`",
-            .name_new = "New `strcpy_sve`",
+#ifdef CMP_LIBC
+            .name_old = "strcpy" xstr(__GLIBC__) "." xstr(__GLIBC_MINOR__),
+#else
+            .name_old = "strcpy (Arm optimized-routines)",
+#endif
+            .name_new = "strcpy (LI-PaRAD/EMOPASS)",
             .nsamples = NSAMPLES,
             .nreps = bench_reps[b],
             .buf_size = buf_sizes[b],
@@ -449,8 +480,12 @@ void bench_strncpy(size_t nbench, size_t const buf_sizes[nbench], size_t const b
     for (size_t b = 0; b < nbench; ++b) {
         // Benchmark initialization
         benchmark_t strncpy_bench = {
-            .name_old = "Current `strncpy_sve`",
-            .name_new = "New `strncpy_sve`",
+#ifdef CMP_LIBC
+            .name_old = "strncpy" xstr(__GLIBC__) "." xstr(__GLIBC_MINOR__),
+#else
+            .name_old = "strncpy (Arm optimized-routines)",
+#endif
+            .name_new = "strncpy (LI-PaRAD/EMOPASS)",
             .nsamples = NSAMPLES,
             .nreps = bench_reps[b],
             .buf_size = buf_sizes[b],
@@ -500,8 +535,12 @@ void bench_strlen(size_t nbench, size_t const buf_sizes[nbench], size_t const be
     for (size_t b = 0; b < nbench; ++b) {
         // Benchmark initialization
         benchmark_t strlen_bench = {
-            .name_old = "Current `strlen_sve`",
-            .name_new = "New `strlen_sve`",
+#ifdef CMP_LIBC
+            .name_old = "strlen" xstr(__GLIBC__) "." xstr(__GLIBC_MINOR__),
+#else
+            .name_old = "strlen (Arm optimized-routines)",
+#endif
+            .name_new = "strlen (LI-PaRAD/EMOPASS)",
             .nsamples = NSAMPLES,
             .nreps = bench_reps[b],
             .buf_size = buf_sizes[b],
@@ -544,8 +583,12 @@ void bench_strnlen(size_t nbench, size_t const buf_sizes[nbench], size_t const b
     for (size_t b = 0; b < nbench; ++b) {
         // Benchmark initialization
         benchmark_t strnlen_bench = {
-            .name_old = "Current `strnlen_sve`",
-            .name_new = "New `strnlen_sve`",
+#ifdef CMP_LIBC
+            .name_old = "strnlen" xstr(__GLIBC__) "." xstr(__GLIBC_MINOR__),
+#else
+            .name_old = "strnlen (Arm optimized-routines)",
+#endif
+            .name_new = "strnlen (LI-PaRAD/EMOPASS)",
             .nsamples = NSAMPLES,
             .nreps = bench_reps[b],
             .buf_size = buf_sizes[b],

@@ -33,31 +33,29 @@ def plot_bandwidth(args):
     df = df[['ROUTINE IMPLEMENTATION', 'BUF SIZE B', 'BW AVG GiB/s', 'BW STDEV GiB/s']]
 
     # Create a new column for implementation type
-    df['Implementation'] = df['ROUTINE IMPLEMENTATION'].apply(lambda x: x if 'Current' in x else f'Ours')
+    df['Implementation'] = df['ROUTINE IMPLEMENTATION'].apply(lambda x: "LI-PaRAD/EMOPASS" if "New" in x else x)
     # Rename BW column
     df['Average bandwidth (GiB/s)'] = df['BW AVG GiB/s']
 
-    # Plot the grouped bar chart
-    fig = px.bar(
+    fig = px.line(
         df,
         x='BUF SIZE B',
         y='BW AVG GiB/s',
         error_y='BW STDEV GiB/s',
         color='Implementation',
-        barmode='group',
-        # text_auto=True,
+        markers=True,
         category_orders={'BUF SIZE B': df['BUF SIZE B'].unique()},
-        title=f'<b>Comparative bandwidth performance of `{routine_name}` implementations</b>'
+        title=f'<b>Comparative average bandwidth performance of `{routine_name}` implementations</b>'
             f'<br><sup>on {target_hardware}</sup>'
     )
 
     # Set the resolution of the figure
     fig.update_layout(
         font=dict(size=20),
-        width=2560, height=1080,
+        width=1400, height=900,
         yaxis=dict(tickmode='linear', dtick=1 if df['BW AVG GiB/s'].max() <= 10 else 2),
-        xaxis_title="<b>String buffer size</b>",
-        yaxis_title="<b>Bandwidth (in GiB/s)</b>",
+        xaxis_title="<b>Buffer size (Bytes)</b>",
+        yaxis_title="<b>Average bandwidth (GiB/s)</b>",
         legend=dict(
             font=dict(size=24),
             title="<b>Implementation</b>",
@@ -90,7 +88,7 @@ if __name__ == "__main__":
     parser.add_argument("-i", dest="input", help="Input CSV file name", required=True)
     parser.add_argument("-o", dest="output", help="Output file name for the plot")
     parser.add_argument("-r", dest="routine", choices=["memcpy", "strcpy", "strncpy", "memcmp", "strcmp", "strncmp", "strchr", "strrchr", "strlen", "strnlen"], help="Routine name", required=True)
-    parser.add_argument("-c", dest="implem", choices=["libc", "aor"], help="Implementation being compared to", required=True)
+    # parser.add_argument("-c", dest="implem", choices=["libc", "aor"], help="Implementation being compared to", required=True)
     parser.add_argument("-t", dest="target", choices=["G3", "G3E", "A64FX", "Grace", "Rhea1"], help="Target hardware")
     args = parser.parse_args()
 
