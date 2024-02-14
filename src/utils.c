@@ -20,11 +20,12 @@
 
 #include "utils.h"
 
+#include <stdint.h>
 #include <stdio.h>
 
 #define BIN_NAME "bench-sve-string-routines"
 #define VERSION_MAJOR 0
-#define VERSION_MINOR 2
+#define VERSION_MINOR 4
 #define VERSION_PATCH 0
 
 inline
@@ -50,17 +51,20 @@ int32_t cmp_double(void const* a, void const* b) {
 void help() {
     fprintf(stderr, "Comparative benchmarks for implementations of Arm SVE optimized string routines\n");
     fprintf(stderr, "Copyright (C) 2024, Laboratoire LI-PaRAD, UVSQ\n\n");
-    fprintf(stderr, "USAGE:\n\t%s [OPTIONS] [FLAGS]\n\n", BIN_NAME);
-    fprintf(stderr, "OPTIONS:\n");
-    fprintf(stderr, "\t--memcmp       Runs benchmark for the `memcmp` routine\n");
-    fprintf(stderr, "\t--strchr       Runs benchmark for the `strchr` routine\n");
-    fprintf(stderr, "\t--strcmp       Runs benchmark for the `strcmp` routine\n");
-    fprintf(stderr, "\t--strcpy       Runs benchmark for the `strcpy` routine\n");
-    fprintf(stderr, "\t--strlen       Runs benchmark for the `strlen` routine\n");
-    fprintf(stderr, "\t--strncmp      Runs benchmark for the `strncmp` routine\n");
-    fprintf(stderr, "\t--strnlen      Runs benchmark for the `strnlen` routine\n");
-    fprintf(stderr, "\t--strrchr      Runs benchmark for the `strrchr` routine\n\n");
-    fprintf(stderr, "FLAGS:\n");
+    fprintf(stderr, "USAGE:\n\t%s [OPTIONS] [FLAGS]\n", BIN_NAME);
+    fprintf(stderr, "\nOPTIONS:\n");
+    fprintf(stderr, "\t-m, --memcmp   Runs benchmark for the `memcmp` routine\n");
+    fprintf(stderr, "\t-x, --memcpy   Runs benchmark for the `memcpy` routine\n");
+    fprintf(stderr, "\t-e, --strcmp   Runs benchmark for the `strcmp` routine\n");
+    fprintf(stderr, "\t-p, --strncmp  Runs benchmark for the `strncmp` routine\n");
+    fprintf(stderr, "\t-s, --strchr   Runs benchmark for the `strchr` routine\n");
+    fprintf(stderr, "\t-r, --strrchr  Runs benchmark for the `strrchr` routine\n");
+    fprintf(stderr, "\t-c, --strcpy   Runs benchmark for the `strcpy` routine\n");
+    fprintf(stderr, "\t-n, --strncpy   Runs benchmark for the `strncpy` routine\n");
+    fprintf(stderr, "\t-y, --strncpy  Runs benchmark for the `strncpy` routine\n");
+    fprintf(stderr, "\t-l, --strlen   Runs benchmark for the `strlen` routine\n");
+    fprintf(stderr, "\t-n, --strnlen  Runs benchmark for the `strnlen` routine\n");
+    fprintf(stderr, "\nFLAGS:\n");
     fprintf(stderr, "\t-h, --help     Prints this help and exits\n");
     fprintf(stderr, "\t-v, --version  Prints version and exits\n");
 }

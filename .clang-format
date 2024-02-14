@@ -126,7 +126,7 @@ IndentCaseLabels: true
 IndentGotoLabels: true
 
 # Indent pre-processor directives before the hash.
-IndentPPDirectives: BeforeHash
+IndentPPDirectives: AfterHash
 
 # Do not indent if a function definition or declaration is wrapped after the type.
 IndentWrappedFunctionNames: false

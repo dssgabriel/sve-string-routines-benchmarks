@@ -20,7 +20,7 @@ cmake_minimum_required(VERSION 3.16)
 project(bench-string-aarch64-sve
     LANGUAGES C ASM
     DESCRIPTION "Comparative benchmarks for alternate implementations of Arm SVE-optimized string routines"
-    VERSION 0.2.0
+    VERSION 0.4.0
 )
 
 set(CMAKE_BUILD_TYPE Release)
@@ -33,23 +33,26 @@ add_executable(bench-sve-string-routines
     src/stats.c
     src/utils.c
     src/main.c
-    string-aarch64-sve/baseline/memcmp-sve.S
-    string-aarch64-sve/baseline/strchr-sve.S
-    string-aarch64-sve/baseline/strcmp-sve.S
-    string-aarch64-sve/baseline/strcpy-sve.S
-    string-aarch64-sve/baseline/strlen-sve.S
-    string-aarch64-sve/baseline/strncmp-sve.S
-    string-aarch64-sve/baseline/strnlen-sve.S
-    string-aarch64-sve/baseline/strrchr-sve.S
-    string-aarch64-sve/new/memcmp-sve.S
-    string-aarch64-sve/new/strchr-sve.S
-    string-aarch64-sve/new/strcmp-sve.S
-    string-aarch64-sve/new/strcpy-sve.S
-    string-aarch64-sve/new/strlen-sve.S
-    string-aarch64-sve/new/strncmp-sve.S
-    string-aarch64-sve/new/strnlen-sve.S
-    string-aarch64-sve/new/strrchr-sve.S
+    string/aarch64/baseline/memcmp-sve.S
+    string/aarch64/baseline/memcpy-sve.S
+    string/aarch64/baseline/strcmp-sve.S
+    string/aarch64/baseline/strncmp-sve.S
+    string/aarch64/baseline/strchr-sve.S
+    string/aarch64/baseline/strrchr-sve.S
+    string/aarch64/baseline/strcpy-sve.S
+    string/aarch64/baseline/strlen-sve.S
+    string/aarch64/baseline/strnlen-sve.S
+    string/aarch64/new/memcmp-sve.S
+    string/aarch64/new/memcpy-sve.S
+    string/aarch64/new/strcmp-sve.S
+    string/aarch64/new/strncmp-sve.S
+    string/aarch64/new/strchr-sve.S
+    string/aarch64/new/strrchr-sve.S
+    string/aarch64/new/strcpy-sve.S
+    string/aarch64/new/strncpy-sve.S
+    string/aarch64/new/strlen-sve.S
+    string/aarch64/new/strnlen-sve.S
 )
-target_include_directories(bench-sve-string-routines PRIVATE include)
-target_compile_options(bench-sve-string-routines PRIVATE "-march=armv8.4-a+sve")
-target_link_libraries(bench-sve-string-routines PRIVATE m)
+target_include_directories(bench-sve-string-routines PUBLIC include)
+target_compile_options(bench-sve-string-routines PUBLIC "-march=armv8.4-a+sve")
+target_link_libraries(bench-sve-string-routines PUBLIC m)

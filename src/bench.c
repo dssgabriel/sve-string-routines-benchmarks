@@ -76,7 +76,7 @@ void bench_print(benchmark_t const self[static 1]) {
     if (!header) {
         printf(
             "%24s |%12s |%15s |%15s |%15s |%15s |%15s |%15s |%15s |%12s\n",
-            "ROUTINE IMPLEMENTATION", "BUF SIZE",
+            "ROUTINE IMPLEMENTATION", "BUF SIZE B",
             "RT MIN ns", "RT MED ns", "RT MAX ns", "RT AVG ns", "RT STDEV %",
             "BW AVG GiB/s", "BW STDEV GiB/s",
             "SPEEDUP"
@@ -85,27 +85,15 @@ void bench_print(benchmark_t const self[static 1]) {
     }
     print_line();
 
-    double array_size = (double)self->buf_size;
-    char* const unit[] = { "B", "KiB", "MiB", "GiB", "TiB" };
-    uint8_t unit_selector = 0;
-    while (array_size >= 1024.0) {
-        array_size /= 1024.0;
-        unit_selector += 1;
-    }
-    char fmt_array_size[13];
-    sprintf(fmt_array_size, "%8.1lf %-3s", array_size, unit[unit_selector]);
-    if (fmt_array_size[10] != 'i') { fmt_array_size[10] = '\0'; }
-    fmt_array_size[12] = '\0';
-
     printf(
-        "%24s |%12s |%15.0lf |%15.0lf |%15.0lf |%15.3lf |%15.3lf |%15.3lf |%15.3lf |\n",
-        self->name_old, fmt_array_size,
+        "%24s |%12zu |%15.3lf |%15.3lf |%15.3lf |%15.3lf |%15.3lf |%15.3lf |%15.3lf |\n",
+        self->name_old, self->buf_size,
         self->rt_old.min, self->rt_old.med, self->rt_old.max, self->rt_old.avg, self->rt_old.err,
         self->bw_old.avg, self->bw_old.err
     );
     printf(
-        "%24s |%12s |%15.0lf |%15.0lf |%15.0lf |%15.3lf |%15.3lf |%15.3lf |%15.3lf |%+11.2lf%%\n",
-        self->name_new, fmt_array_size,
+        "%24s |%12zu |%15.3lf |%15.3lf |%15.3lf |%15.3lf |%15.3lf |%15.3lf |%15.3lf |%+11.2lf%%\n",
+        self->name_new, self->buf_size,
         self->rt_new.min, self->rt_new.med, self->rt_new.max, self->rt_new.avg, self->rt_new.err,
         self->bw_new.avg, self->bw_new.err,
         (self->rt_speedup - 1.0) * 100.0
