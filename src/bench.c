@@ -67,7 +67,7 @@ void bench_process(
 }
 
 static inline void print_line() {
-    for (size_t i = 0; i < 17 * 7 + 14 * 2 + 25; ++i) { printf("-"); }
+    for (size_t i = 0; i < 17 * 7 + 14 * 2 + 31; ++i) { printf("-"); }
     printf("\n");
 }
 
@@ -75,7 +75,7 @@ void bench_print(benchmark_t const self[static 1]) {
     static bool header = false;
     if (!header) {
         printf(
-            "%24s |%12s |%15s |%15s |%15s |%15s |%15s |%15s |%15s |%12s\n",
+            "%30s |%12s |%15s |%15s |%15s |%15s |%15s |%15s |%15s |%12s\n",
             "ROUTINE IMPLEMENTATION", "BUF SIZE B",
             "RT MIN ns", "RT MED ns", "RT MAX ns", "RT AVG ns", "RT STDEV %",
             "BW AVG GiB/s", "BW STDEV GiB/s",
@@ -86,13 +86,13 @@ void bench_print(benchmark_t const self[static 1]) {
     print_line();
 
     printf(
-        "%24s |%12zu |%15.3lf |%15.3lf |%15.3lf |%15.3lf |%15.3lf |%15.3lf |%15.3lf |\n",
+        "%30s |%12zu |%15.3lf |%15.3lf |%15.3lf |%15.3lf |%15.3lf |%15.3lf |%15.3lf |\n",
         self->name_old, self->buf_size,
         self->rt_old.min, self->rt_old.med, self->rt_old.max, self->rt_old.avg, self->rt_old.err,
         self->bw_old.avg, self->bw_old.err
     );
     printf(
-        "%24s |%12zu |%15.3lf |%15.3lf |%15.3lf |%15.3lf |%15.3lf |%15.3lf |%15.3lf |%+11.2lf%%\n",
+        "%30s |%12zu |%15.3lf |%15.3lf |%15.3lf |%15.3lf |%15.3lf |%15.3lf |%15.3lf |%+11.2lf%%\n",
         self->name_new, self->buf_size,
         self->rt_new.min, self->rt_new.med, self->rt_new.max, self->rt_new.avg, self->rt_new.err,
         self->bw_new.avg, self->bw_new.err,

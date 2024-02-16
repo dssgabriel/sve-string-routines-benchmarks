@@ -22,16 +22,18 @@ ENTRY (new_strnlen_aarch64_sve)
 
 	mov	x2, xzr			/* initialize len */
 	cntb	x3
+	b	L(entry)
 
 	.p2align 4
 	/* We have off + vl <= max, and so may read the whole vector.  */
 L(loop):
-	whilelo	p0.b, x2, x1
 	ld1b	z0.b, p0/z, [x0, x2]
 	cmpeq	p2.b, p0/z, z0.b, #0
 	b.any	L(zero)
 
 	add	x2, x2, x3
+L(entry):
+	whilelo	p0.b, x2, x1
 	b.last	L(loop)
 
 	/* We have off + vl < max.  Test for off == max before proceeding.  */

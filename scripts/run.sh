@@ -7,6 +7,6 @@ routines=(memcmp strcmp strncmp memcpy strcpy strncpy strchr strrchr strlen strn
 
 for i in ${!routines[@]}; do
     j=$(($i + ${#routines[@]}))
-    taskset -c $i $LIBC_BIN --${routines[$i]} > results/raw/$r-libc.dat &
-    taskset -c $j $AOR_BIN --${routines[$i]} > results/raw/$r-aor.dat &
+    taskset -c $i $LIBC_BIN --${routines[$i]} > results/raw/${routines[$i]}-libc.dat &
+    taskset -c $j $AOR_BIN --${routines[$i]} > results/raw/${routines[$i]}-aor.dat &
 done

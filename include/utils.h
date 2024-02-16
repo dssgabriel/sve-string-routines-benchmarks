@@ -24,6 +24,9 @@
 
 #include <time.h>
 
+#define xstr(s) str(s)
+#define str(s) #s
+
 /// Compute elapsed time in nanoseconds between two `struct timespec` points in time.
 double elapsed_ns(struct timespec a, struct timespec b);
 
@@ -32,6 +35,12 @@ double ns_to_s(double ns);
 
 /// Compares two `double` values (used in `qsort`).
 int32_t cmp_double(void const* a, void const* b);
+
+/// Random buffer initialization helper.
+void init_buf_rand(size_t n, void** buf, bool is_str);
+
+/// Buffer copy helper.
+void init_buf_copy(size_t n, void** buf_dst, void const* const* buf_src);
 
 /// Prints program help.
 void help();

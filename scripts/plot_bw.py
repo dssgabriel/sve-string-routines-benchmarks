@@ -23,7 +23,7 @@ def plot_bandwidth(args):
             target_hardware = "unknown hardware"
     
     # Convert CSV data to DataFrame
-    df = pd.read_csv(input_file, sep='|', skipinitialspace=True, skiprows=lambda x: x == 1 or x % 3 == 1)
+    df = pd.read_csv(input_file, sep='|', skipinitialspace=True, skiprows=lambda x: x == 1 or x % 4 == 1)
     # Remove whitespace from column entries
     df = df.apply(lambda x: x.str.strip() if x.dtype == 'object' else x)
     # Remove whitespace from column names
