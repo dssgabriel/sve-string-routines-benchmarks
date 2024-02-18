@@ -90,8 +90,8 @@ void bench_memcmp(size_t nbench, size_t const buf_sizes[nbench], size_t const be
         // Random memory initialization
         char *s1 = alloc(buf_sizes[b] + 1);
         char *s2 = alloc(buf_sizes[b] + 1);
-        init_buf_rand(buf_sizes[b], s1, false);
-        init_buf_copy(buf_sizes[b], s2); // Make data identical to avoid early function exit
+        init_buf_rand(buf_sizes[b], &s1, false);
+        init_buf_copy(buf_sizes[b], &s2, s1); // Make data identical to avoid early function exit
 
 #ifdef DEBUG
         fprintf(stderr, "Checking `new_memcmp_aarch64_sve`... ");
@@ -147,7 +147,7 @@ void bench_memcpy(size_t nbench, size_t const buf_sizes[nbench], size_t const be
         // Random char initialization
         char *src = alloc(buf_sizes[b] + 1);
         char *dst = alloc(buf_sizes[b] + 1);
-        init_buf_rand(buf_sizes[b], src, false);
+        init_buf_rand(buf_sizes[b], &src, false);
 
 #ifdef DEBUG
         fprintf(stderr, "Checking `new_memcpy_aarch64_sve`... ");
@@ -201,16 +201,15 @@ void bench_strcmp(size_t nbench, size_t const buf_sizes[nbench], size_t const be
         // Random ASCII initialization
         char *s1 = alloc(buf_sizes[b] + 1);
         char *s2 = alloc(buf_sizes[b] + 1);
-        for (size_t c = 0; c < buf_sizes[b]; ++c) {
-            s1[c] = (char)(rand() % 95 + 32);
-            s2[c] = s1[c]; // Make strings identical to avoid early function exit
-        }
-        s1[buf_sizes[b]] = '\0';
-        s2[buf_sizes[b]] = '\0';
+        init_buf_rand(buf_sizes[b], &s1, true);
+        init_buf_copy(buf_sizes[b], &s2, s1);
 
 #ifdef DEBUG
         fprintf(stderr, "Checking `new_strcmp_aarch64_sve`\n");
-        assert(strcmp(s1, s2) == new_strcmp_aarch64_sve(s1, s2) && "`new_strcmp_aarch64_sve` failed");
+        assert(
+            strcmp(s1, s2) == new_strcmp_aarch64_sve(s1, s2) &&
+            "`new_strcmp_aarch64_sve` failed"
+        );
 #endif
 
         // Warmup runs
@@ -258,12 +257,8 @@ void bench_strncmp(size_t nbench, size_t const buf_sizes[nbench], size_t const b
         // Random ASCII initialization
         char *s1 = alloc(buf_sizes[b] + 1);
         char *s2 = alloc(buf_sizes[b] + 1);
-        for (size_t c = 0; c < buf_sizes[b]; ++c) {
-            s1[c] = (char)(rand() % 95 + 32);
-            s2[c] = s1[c]; // Make strings identical to avoid early function exit
-        }
-        s1[buf_sizes[b]] = '\0';
-        s2[buf_sizes[b]] = '\0';
+        init_buf_rand(buf_sizes[b], &s1, true);
+        init_buf_copy(buf_sizes[b], &s2, s1);
 
 #ifdef DEBUG
         fprintf(stderr, "Checking `new_strncmp_aarch64_sve`\n");
@@ -317,336 +312,294 @@ void bench_strchr(size_t nbench, size_t const buf_sizes[nbench], size_t const be
 
         // Random ASCII initialization
         char *s = alloc(buf_sizes[b] + 1);
-        for (size_t c = 0; c < buf_sizes[b]; ++c) {
-            s[c] = (char)(rand() % 95 + 32);
-        }
-        s[buf_sizes[b]] = '\0';
+        init_buf_rand(buf_sizes[b], &s, true);
         int32_t c = 0; // Look for '\0'
 
 #ifdef DEBUG
-    fprintf(stderr, "Checking `new_strchr_aarch64_sve`\n");
-    assert(strchr(s, c) == new_strchr_aarch64_sve(s, c) &&
-           "`new_strchr_aarch64_sve` failed");
+        fprintf(stderr, "Checking `new_strchr_aarch64_sve`\n");
+        assert(strchr(s, c) == new_strchr_aarch64_sve(s, c) && "`new_strchr_aarch64_sve` failed");
 #endif
 
-    // Warmup runs
-    size_t const warmup_cnt = determine_warmup_cnt(bench_reps[b]);
-    for (size_t i = 0; i < warmup_cnt; ++i) {
-      (void)strchr(s, c);
-    }
+        // Warmup runs
+        size_t const warmup_cnt = determine_warmup_cnt(bench_reps[b]);
+        for (size_t i = 0; i < warmup_cnt; ++i) {
+            (void)strchr(s, c);
+        }
 
 // Run benchmark
 #ifdef CMP_LIBC
-    driver_strchr(NSAMPLES, bench_reps[b], samples_old, strchr, s, c);
+        driver_strchr(NSAMPLES, bench_reps[b], samples_old, strchr, s, c);
 #else
-    driver_strchr(NSAMPLES, bench_reps[b], samples_old, __strchr_aarch64_sve, s,
-                  c);
+        driver_strchr(NSAMPLES, bench_reps[b], samples_old, __strchr_aarch64_sve, s, c);
 #endif
-    driver_strchr(NSAMPLES, bench_reps[b], samples_new, new_strchr_aarch64_sve,
-                  s, c);
+        driver_strchr(NSAMPLES, bench_reps[b], samples_new, new_strchr_aarch64_sve, s, c);
 
-    // Process and display results
-    bench_process(&strchr_bench, NSAMPLES, samples_old, samples_new);
-    bench_print(&strchr_bench);
+        // Process and display results
+        bench_process(&strchr_bench, NSAMPLES, samples_old, samples_new);
+        bench_print(&strchr_bench);
 
-    // Cleanup
-    free(s);
-  }
+        // Cleanup
+        free(s);
+    }
 }
 
-void bench_strrchr(size_t nbench, size_t const buf_sizes[nbench],
-                   size_t const bench_reps[nbench]) {
-  double samples_old[NSAMPLES] = {0};
-  double samples_new[NSAMPLES] = {0};
+void bench_strrchr(size_t nbench, size_t const buf_sizes[nbench], size_t const bench_reps[nbench]) {
+    double samples_old[NSAMPLES] = {0};
+    double samples_new[NSAMPLES] = {0};
 
-  for (size_t b = 0; b < nbench; ++b) {
-    // Benchmark initialization
-    benchmark_t strrchr_bench = {
+    for (size_t b = 0; b < nbench; ++b) {
+        // Benchmark initialization
+        benchmark_t strrchr_bench = {
 #ifdef CMP_LIBC
-        .name_old =
-            "strrchr GNU libc " xstr(__GLIBC__) "." xstr(__GLIBC_MINOR__),
+            .name_old = "strrchr GNU libc " xstr(__GLIBC__) "." xstr(__GLIBC_MINOR__),
 #else
-        .name_old = "strrchr Arm optimized-routines",
+            .name_old = "strrchr Arm optimized-routines",
 #endif
-        .name_new = "strrchr LI-PaRAD/EMOPASS",
-        .nsamples = NSAMPLES,
-        .nreps = bench_reps[b],
-        .buf_size = buf_sizes[b],
-    };
+            .name_new = "strrchr LI-PaRAD/EMOPASS",
+            .nsamples = NSAMPLES,
+            .nreps = bench_reps[b],
+            .buf_size = buf_sizes[b],
+        };
 
-    // Random ASCII initialization
-    char *s = alloc(buf_sizes[b] + 1);
-    for (size_t c = 0; c < buf_sizes[b]; ++c) {
-      s[c] = (char)(rand() % 95 + 32);
-    }
-    s[buf_sizes[b]] = '\0';
-    int32_t c = 0; // Look for '\0'
+        // Random ASCII initialization
+        char *s = alloc(buf_sizes[b] + 1);
+        init_buf_rand(buf_sizes[b], &s, true);
+        int32_t c = 0; // Look for '\0'
 
 #ifdef DEBUG
-    fprintf(stderr, "Checking `new_strrchr_aarch64_sve`\n");
-    assert(strrchr(s, c) == new_strrchr_aarch64_sve(s, c) &&
-           "`new_strrchr_aarch64_sve` failed");
+        fprintf(stderr, "Checking `new_strrchr_aarch64_sve`\n");
+        assert(
+            strrchr(s, c) == new_strrchr_aarch64_sve(s, c) &&
+            "`new_strrchr_aarch64_sve` failed"
+        );
 #endif
 
-    // Warmup runs
-    size_t const warmup_cnt = determine_warmup_cnt(bench_reps[b]);
-    for (size_t i = 0; i < warmup_cnt; ++i) {
-      (void)strrchr(s, c);
-    }
+        // Warmup runs
+        size_t const warmup_cnt = determine_warmup_cnt(bench_reps[b]);
+        for (size_t i = 0; i < warmup_cnt; ++i) {
+            (void)strrchr(s, c);
+        }
 
-// Run benchmark
+        // Run benchmark
 #ifdef CMP_LIBC
-    driver_strrchr(NSAMPLES, bench_reps[b], samples_old, strrchr, s, c);
+        driver_strrchr(NSAMPLES, bench_reps[b], samples_old, strrchr, s, c);
 #else
-    driver_strrchr(NSAMPLES, bench_reps[b], samples_old, __strrchr_aarch64_sve,
-                   s, c);
+        driver_strrchr(NSAMPLES, bench_reps[b], samples_old, __strrchr_aarch64_sve, s, c);
 #endif
-    driver_strrchr(NSAMPLES, bench_reps[b], samples_new,
-                   new_strrchr_aarch64_sve, s, c);
+        driver_strrchr(NSAMPLES, bench_reps[b], samples_new, new_strrchr_aarch64_sve, s, c);
 
-    // Process and display results
-    bench_process(&strrchr_bench, NSAMPLES, samples_old, samples_new);
-    bench_print(&strrchr_bench);
+        // Process and display results
+        bench_process(&strrchr_bench, NSAMPLES, samples_old, samples_new);
+        bench_print(&strrchr_bench);
 
-    // Cleanup
-    free(s);
-  }
+        // Cleanup
+        free(s);
+    }
 }
 
-void bench_strcpy(size_t nbench, size_t const buf_sizes[nbench],
-                  size_t const bench_reps[nbench]) {
-  double samples_old[NSAMPLES] = {0};
-  double samples_new[NSAMPLES] = {0};
+void bench_strcpy(size_t nbench, size_t const buf_sizes[nbench], size_t const bench_reps[nbench]) {
+    double samples_old[NSAMPLES] = {0};
+    double samples_new[NSAMPLES] = {0};
 
-  for (size_t b = 0; b < nbench; ++b) {
-    // Benchmark initialization
-    benchmark_t strcpy_bench = {
+    for (size_t b = 0; b < nbench; ++b) {
+        // Benchmark initialization
+        benchmark_t strcpy_bench = {
 #ifdef CMP_LIBC
-        .name_old =
-            "strcpy GNU libc " xstr(__GLIBC__) "." xstr(__GLIBC_MINOR__),
+            .name_old = "strcpy GNU libc " xstr(__GLIBC__) "." xstr(__GLIBC_MINOR__),
 #else
-        .name_old = "strcpy Arm optimized-routines",
+            .name_old = "strcpy Arm optimized-routines",
 #endif
-        .name_new = "strcpy LI-PaRAD/EMOPASS",
-        .nsamples = NSAMPLES,
-        .nreps = bench_reps[b],
-        .buf_size = buf_sizes[b],
-    };
+            .name_new = "strcpy LI-PaRAD/EMOPASS",
+            .nsamples = NSAMPLES,
+            .nreps = bench_reps[b],
+            .buf_size = buf_sizes[b],
+        };
 
-    // Random ASCII initialization
-    char *src = alloc(buf_sizes[b] + 1);
-    char *dst = alloc(buf_sizes[b] + 1);
-    for (size_t c = 0; c < buf_sizes[b]; ++c) {
-      src[c] = (char)(rand() % 95 + 32);
-    }
-    src[buf_sizes[b]] = '\0';
-    dst[buf_sizes[b]] = '\0';
+        // Random ASCII initialization
+        char *src = alloc(buf_sizes[b] + 1);
+        char *dst = alloc(buf_sizes[b] + 1);
+        init_buf_rand(buf_sizes[b], &src, true);
 
 #ifdef DEBUG
-    fprintf(stderr, "Checking `new_strcpy_aarch64_sve`\n");
-    new_strcpy_aarch64_sve(dst, src);
-    assert(strcmp(src, dst) == 0 && "`new_strcpy_aarch64_sve` failed");
+        fprintf(stderr, "Checking `new_strcpy_aarch64_sve`\n");
+        new_strcpy_aarch64_sve(dst, src);
+        assert(strcmp(src, dst) == 0 && "`new_strcpy_aarch64_sve` failed");
 #endif
 
-    // Warmup runs
-    size_t const warmup_cnt = determine_warmup_cnt(bench_reps[b]);
-    for (size_t i = 0; i < warmup_cnt; ++i) {
-      (void)strcpy(dst, src);
-    }
+        // Warmup runs
+        size_t const warmup_cnt = determine_warmup_cnt(bench_reps[b]);
+        for (size_t i = 0; i < warmup_cnt; ++i) {
+            (void)strcpy(dst, src);
+        }
 
-// Run benchmark
+        // Run benchmark
 #ifdef CMP_LIBC
-    driver_strcpy(NSAMPLES, bench_reps[b], samples_old, strcpy, dst, src);
+        driver_strcpy(NSAMPLES, bench_reps[b], samples_old, strcpy, dst, src);
 #else
-    driver_strcpy(NSAMPLES, bench_reps[b], samples_old, __strcpy_aarch64_sve,
-                  dst, src);
+        driver_strcpy(NSAMPLES, bench_reps[b], samples_old, __strcpy_aarch64_sve, dst, src);
 #endif
-    driver_strcpy(NSAMPLES, bench_reps[b], samples_new, new_strcpy_aarch64_sve,
-                  dst, src);
+        driver_strcpy(NSAMPLES, bench_reps[b], samples_new, new_strcpy_aarch64_sve, dst, src);
 
-    // Process and display results
-    bench_process(&strcpy_bench, NSAMPLES, samples_old, samples_new);
-    bench_print(&strcpy_bench);
+        // Process and display results
+        bench_process(&strcpy_bench, NSAMPLES, samples_old, samples_new);
+        bench_print(&strcpy_bench);
 
-    // Cleanup
-    free(src);
-    free(dst);
-  }
+        // Cleanup
+        free(src);
+        free(dst);
+    }
 }
 
-void bench_strncpy(size_t nbench, size_t const buf_sizes[nbench],
-                   size_t const bench_reps[nbench]) {
-  double samples_old[NSAMPLES] = {0};
-  double samples_new[NSAMPLES] = {0};
+void bench_strncpy(size_t nbench, size_t const buf_sizes[nbench], size_t const bench_reps[nbench]) {
+    double samples_old[NSAMPLES] = {0};
+    double samples_new[NSAMPLES] = {0};
 
-  for (size_t b = 0; b < nbench; ++b) {
-    // Benchmark initialization
-    benchmark_t strncpy_bench = {
+    for (size_t b = 0; b < nbench; ++b) {
+        // Benchmark initialization
+        benchmark_t strncpy_bench = {
 #ifdef CMP_LIBC
-        .name_old =
-            "strncpy GNU libc " xstr(__GLIBC__) "." xstr(__GLIBC_MINOR__),
+            .name_old = "strncpy GNU libc " xstr(__GLIBC__) "." xstr(__GLIBC_MINOR__),
 #else
-        .name_old = "strncpy Arm optimized-routines",
+            .name_old = "strncpy Arm optimized-routines",
 #endif
-        .name_new = "strncpy LI-PaRAD/EMOPASS",
-        .nsamples = NSAMPLES,
-        .nreps = bench_reps[b],
-        .buf_size = buf_sizes[b],
-    };
+            .name_new = "strncpy LI-PaRAD/EMOPASS",
+            .nsamples = NSAMPLES,
+            .nreps = bench_reps[b],
+            .buf_size = buf_sizes[b],
+        };
 
-    // Random ASCII initialization
-    char *src = alloc(buf_sizes[b] + 1);
-    char *dst = alloc(buf_sizes[b] + 1);
-    for (size_t c = 0; c < buf_sizes[b]; ++c) {
-      src[c] = (char)(rand() % 95 + 32);
-    }
-    src[buf_sizes[b]] = '\0';
-    dst[buf_sizes[b]] = '\0';
+        // Random ASCII initialization
+        char *src = alloc(buf_sizes[b] + 1);
+        char *dst = alloc(buf_sizes[b] + 1);
+        init_buf_rand(buf_sizes[b], &src, true);
 
 #ifdef DEBUG
-    fprintf(stderr, "Checking `new_strncpy_aarch64_sve`\n");
-    new_strncpy_aarch64_sve(dst, src, buf_sizes[b]);
-    assert(strncmp(src, dst, buf_sizes[b]) == 0 &&
-           "`new_strncpy_aarch64_sve` failed");
+        fprintf(stderr, "Checking `new_strncpy_aarch64_sve`\n");
+        new_strncpy_aarch64_sve(dst, src, buf_sizes[b]);
+        assert(strncmp(src, dst, buf_sizes[b]) == 0 && "`new_strncpy_aarch64_sve` failed");
 #endif
 
-    // Warmup runs
-    size_t const warmup_cnt = determine_warmup_cnt(bench_reps[b]);
-    for (size_t i = 0; i < warmup_cnt; ++i) {
-      (void)strncpy(dst, src, buf_sizes[b]);
+        // Warmup runs
+        size_t const warmup_cnt = determine_warmup_cnt(bench_reps[b]);
+        for (size_t i = 0; i < warmup_cnt; ++i) {
+            (void)strncpy(dst, src, buf_sizes[b]);
+        }
+
+        // Run benchmark
+        driver_strncpy(NSAMPLES, bench_reps[b], samples_old, strncpy, dst, src, buf_sizes[b]);
+        driver_strncpy(NSAMPLES, bench_reps[b], samples_new, new_strncpy_aarch64_sve, dst, src, buf_sizes[b]);
+
+        // Process and display results
+        bench_process(&strncpy_bench, NSAMPLES, samples_old, samples_new);
+        bench_print(&strncpy_bench);
+
+        // Cleanup
+        free(src);
+        free(dst);
     }
-
-    // Run benchmark
-    driver_strncpy(NSAMPLES, bench_reps[b], samples_old, strncpy, dst, src,
-                   buf_sizes[b]);
-    driver_strncpy(NSAMPLES, bench_reps[b], samples_new,
-                   new_strncpy_aarch64_sve, dst, src, buf_sizes[b]);
-
-    // Process and display results
-    bench_process(&strncpy_bench, NSAMPLES, samples_old, samples_new);
-    bench_print(&strncpy_bench);
-
-    // Cleanup
-    free(src);
-    free(dst);
-  }
 }
 
-void bench_strlen(size_t nbench, size_t const buf_sizes[nbench],
-                  size_t const bench_reps[nbench]) {
-  double samples_old[NSAMPLES] = {0};
-  double samples_new[NSAMPLES] = {0};
+void bench_strlen(size_t nbench, size_t const buf_sizes[nbench], size_t const bench_reps[nbench]) {
+    double samples_old[NSAMPLES] = {0};
+    double samples_new[NSAMPLES] = {0};
 
-  for (size_t b = 0; b < nbench; ++b) {
-    // Benchmark initialization
-    benchmark_t strlen_bench = {
+    for (size_t b = 0; b < nbench; ++b) {
+        // Benchmark initialization
+        benchmark_t strlen_bench = {
 #ifdef CMP_LIBC
-        .name_old =
-            "strlen GNU libc " xstr(__GLIBC__) "." xstr(__GLIBC_MINOR__),
+            .name_old = "strlen GNU libc " xstr(__GLIBC__) "." xstr(__GLIBC_MINOR__),
 #else
-        .name_old = "strlen Arm optimized-routines",
+            .name_old = "strlen Arm optimized-routines",
 #endif
-        .name_new = "strlen LI-PaRAD/EMOPASS",
-        .nsamples = NSAMPLES,
-        .nreps = bench_reps[b],
-        .buf_size = buf_sizes[b],
-    };
+            .name_new = "strlen LI-PaRAD/EMOPASS",
+            .nsamples = NSAMPLES,
+            .nreps = bench_reps[b],
+            .buf_size = buf_sizes[b],
+        };
 
-    // Random ASCII initialization
-    char *s = alloc(buf_sizes[b] + 1);
-    for (size_t c = 0; c < buf_sizes[b]; ++c) {
-      s[c] = (char)(rand() % 95 + 32);
-    }
-    s[buf_sizes[b]] = '\0';
+        // Random ASCII initialization
+        char *s = alloc(buf_sizes[b] + 1);
+        init_buf_rand(buf_sizes[b], &s, true);
 
 #ifdef DEBUG
-    fprintf(stderr, "Checking `new_strlen_aarch64_sve`\n");
-    assert(new_strlen_aarch64_sve(s) == buf_sizes[b] &&
-           "`new_strlen_aarch64_sve` failed");
+        fprintf(stderr, "Checking `new_strlen_aarch64_sve`\n");
+        assert(new_strlen_aarch64_sve(s) == buf_sizes[b] && "`new_strlen_aarch64_sve` failed");
 #endif
 
-    // Warmup runs
-    size_t const warmup_cnt = determine_warmup_cnt(bench_reps[b]);
-    for (size_t i = 0; i < warmup_cnt; ++i) {
-      (void)strlen(s);
-    }
+        // Warmup runs
+        size_t const warmup_cnt = determine_warmup_cnt(bench_reps[b]);
+        for (size_t i = 0; i < warmup_cnt; ++i) {
+            (void)strlen(s);
+        }
 
-// Run benchmark
+        // Run benchmark
 #ifdef CMP_LIBC
-    driver_strlen(NSAMPLES, bench_reps[b], samples_old, strlen, s);
+        driver_strlen(NSAMPLES, bench_reps[b], samples_old, strlen, s);
 #else
-    driver_strlen(NSAMPLES, bench_reps[b], samples_old, __strlen_aarch64_sve,
-                  s);
+        driver_strlen(NSAMPLES, bench_reps[b], samples_old, __strlen_aarch64_sve, s);
 #endif
-    driver_strlen(NSAMPLES, bench_reps[b], samples_new, new_strlen_aarch64_sve,
-                  s);
+        driver_strlen(NSAMPLES, bench_reps[b], samples_new, new_strlen_aarch64_sve, s);
 
-    // Process and display results
-    bench_process(&strlen_bench, NSAMPLES, samples_old, samples_new);
-    bench_print(&strlen_bench);
+        // Process and display results
+        bench_process(&strlen_bench, NSAMPLES, samples_old, samples_new);
+        bench_print(&strlen_bench);
 
-    // Cleanup
-    free(s);
-  }
+        // Cleanup
+        free(s);
+    }
 }
 
-void bench_strnlen(size_t nbench, size_t const buf_sizes[nbench],
-                   size_t const bench_reps[nbench]) {
-  double samples_old[NSAMPLES] = {0};
-  double samples_new[NSAMPLES] = {0};
+void bench_strnlen(size_t nbench, size_t const buf_sizes[nbench], size_t const bench_reps[nbench]) {
+    double samples_old[NSAMPLES] = {0};
+    double samples_new[NSAMPLES] = {0};
 
-  for (size_t b = 0; b < nbench; ++b) {
-    // Benchmark initialization
-    benchmark_t strnlen_bench = {
+    for (size_t b = 0; b < nbench; ++b) {
+        // Benchmark initialization
+        benchmark_t strnlen_bench = {
 #ifdef CMP_LIBC
-        .name_old =
-            "strnlen GNU libc " xstr(__GLIBC__) "." xstr(__GLIBC_MINOR__),
+            .name_old = "strnlen GNU libc " xstr(__GLIBC__) "." xstr(__GLIBC_MINOR__),
 #else
-        .name_old = "strnlen Arm optimized-routines",
+            .name_old = "strnlen Arm optimized-routines",
 #endif
-        .name_new = "strnlen LI-PaRAD/EMOPASS",
-        .nsamples = NSAMPLES,
-        .nreps = bench_reps[b],
-        .buf_size = buf_sizes[b],
-    };
+            .name_new = "strnlen LI-PaRAD/EMOPASS",
+            .nsamples = NSAMPLES,
+            .nreps = bench_reps[b],
+            .buf_size = buf_sizes[b],
+        };
 
-    // Random ASCII initialization
-    char *s = alloc(buf_sizes[b] + 1);
-    for (size_t c = 0; c < buf_sizes[b]; ++c) {
-      s[c] = (char)(rand() % 95 + 32);
-    }
-    s[buf_sizes[b]] = '\0';
+        // Random ASCII initialization
+        char *s = alloc(buf_sizes[b] + 1);
+        init_buf_rand(buf_sizes[b], &s, true);
 
 #ifdef DEBUG
-    fprintf(stderr, "Checking `new_strnlen_aarch64_sve`\n");
-    assert(new_strnlen_aarch64_sve(s, buf_sizes[b] * 2) == buf_sizes[b] &&
-           "`new_strnlen_aarch64_sve` failed");
+        fprintf(stderr, "Checking `new_strnlen_aarch64_sve`\n");
+        assert(
+            new_strnlen_aarch64_sve(s, buf_sizes[b] * 2) == buf_sizes[b] &&
+            "`new_strnlen_aarch64_sve` failed"
+        );
 #endif
 
-    // Warmup runs
-    size_t const warmup_cnt = determine_warmup_cnt(bench_reps[b]);
-    for (size_t i = 0; i < warmup_cnt; ++i) {
-      (void)strnlen(s, buf_sizes[b]);
-    }
+        // Warmup runs
+        size_t const warmup_cnt = determine_warmup_cnt(bench_reps[b]);
+        for (size_t i = 0; i < warmup_cnt; ++i) {
+            (void)strnlen(s, buf_sizes[b]);
+        }
 
-// Run benchmark
+        // Run benchmark
 #ifdef CMP_LIBC
-    driver_strnlen(NSAMPLES, bench_reps[b], samples_old, strnlen, s,
-                   buf_sizes[b]);
+        driver_strnlen(NSAMPLES, bench_reps[b], samples_old, strnlen, s, buf_sizes[b]);
 #else
-    driver_strnlen(NSAMPLES, bench_reps[b], samples_old, __strnlen_aarch64_sve,
-                   s, buf_sizes[b]);
+        driver_strnlen(NSAMPLES, bench_reps[b], samples_old, __strnlen_aarch64_sve, s, buf_sizes[b]);
 #endif
-    driver_strnlen(NSAMPLES, bench_reps[b], samples_new,
-                   new_strnlen_aarch64_sve, s, buf_sizes[b]);
+        driver_strnlen(NSAMPLES, bench_reps[b], samples_new, new_strnlen_aarch64_sve, s, buf_sizes[b]);
 
-    // Process and display results
-    bench_process(&strnlen_bench, NSAMPLES, samples_old, samples_new);
-    bench_print(&strnlen_bench);
+        // Process and display results
+        bench_process(&strnlen_bench, NSAMPLES, samples_old, samples_new);
+        bench_print(&strnlen_bench);
 
-    // Cleanup
-    free(s);
-  }
+        // Cleanup
+        free(s);
+    }
 }
 
 int32_t main(int32_t argc, char *argv[argc + 1]) {

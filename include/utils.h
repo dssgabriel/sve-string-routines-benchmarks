@@ -37,13 +37,13 @@ double ns_to_s(double ns);
 int32_t cmp_double(void const* a, void const* b);
 
 /// Random buffer initialization helper.
-void init_buf_rand(size_t n, void** buf, bool is_str);
+void init_buf_rand(size_t n, char** buf, bool is_str);
 
 /// Buffer copy helper.
-void init_buf_copy(size_t n, void** buf_dst, void const* const* buf_src);
+void init_buf_copy(size_t n, char** buf_dst, char const* buf_src);
 
 /// Prints program help.
-void help();
+void help(void);
 
 /// Prints program version.
-void version();
+void version(void);

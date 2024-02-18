@@ -49,28 +49,33 @@ int32_t cmp_double(void const* a, void const* b) {
 }
 
 // Assumes buffer has allocated size `n + 1`
-inline void init_buf_rand(size_t n, void** buf, bool is_str) {
+inline void init_buf_rand(size_t n, char** buf, bool is_str) {
     assert(*buf != NULL && "buffer cannot be nullptr");
-    for (size_t i = 0; i < n; ++i) {
-        if (is_str) {
-        } else {
-            *(char*)buf[i] = (char)(rand() % 126 + 1);
+    if (is_str) {
+        for (size_t i = 0; i < n; ++i) {
+            // Random alphanumeric character
+            *buf[i] = (char)(rand() % 95 + 32);
+        }
+    } else {
+        for (size_t i = 0; i < n; ++i) {
+            // Random non-null ASCII character
+            *buf[i] = (char)(rand() % 126 + 1);
         }
     }
-    *(char*)buf[n] = '\0';
+    *buf[n] = '\0';
 }
 
 // Assumes both buffers have the same length `n` (and allocated size `n + 1`)
-inline void init_buf_copy(size_t n, void** buf_dst, void const* const* buf_src) {
+inline void init_buf_copy(size_t n, char** buf_dst, char const* buf_src) {
     assert(*buf_dst != NULL && "destination buffer cannot be nullptr");
-    assert(*buf_src != NULL && "source buffer cannot be nullptr");
+    assert(buf_src != NULL && "source buffer cannot be nullptr");
     for (size_t i = 0; i < n; ++i) {
-        *(char*)buf_dst[i] = *(char*)buf_dst[i];
+        *buf_dst[i] = buf_src[i];
     }
-    *(char*)buf_dst[n] = '\0';
+    *buf_dst[n] = '\0';
 }
 
-void help() {
+void help(void) {
     fprintf(stderr, "Comparative benchmarks for implementations of Arm SVE optimized string routines\n");
     fprintf(stderr, "Copyright (C) 2024, Laboratoire LI-PaRAD, UVSQ\n\n");
     fprintf(stderr, "USAGE:\n\t%s [OPTIONS] [FLAGS]\n", BIN_NAME);
@@ -90,7 +95,7 @@ void help() {
     fprintf(stderr, "\t-v, --version  Prints version and exits\n");
 }
 
-void version() {
+void version(void) {
     fprintf(stderr, "%s v%d.%d.%d\n", BIN_NAME, VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
     fprintf(stderr, "Copyright (C) 2024, Laboratoire LI-PaRAD, UVSQ\n");
 }
