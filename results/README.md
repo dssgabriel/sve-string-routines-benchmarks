@@ -121,11 +121,11 @@ On short strings, some specific string lengths show noticeable performance drops
 However, we think this is worth merging into AOR/libc as the overall performance gains largely outweigh the losses shown on some short string lengths with unaligned data. 
 
 <p>
-  <img src="plots/short_strs/noalign/strcpy_libc.png" width=49% alt="Average bandwidth performance of `strcpy` on short strings (non-aligned data)">
+  <img src="plots/short_strs/noalign/strcpy_libc.png" width=49% alt="Average bandwidth performance of `strcpy` on short strings (unaligned data)">
   <img src="plots/short_strs/align/strcpy_libc.png" align="right" width=49% alt="Average bandwidth performance of `strcpy` on short strings (aligned data)">
 </p>
 <p>
-  <img src="plots/full_sizes/noalign/strcpy_libc.png" width=49% alt="Average bandwidth performance of `strcpy` (non-aligned data)">
+  <img src="plots/full_sizes/noalign/strcpy_libc.png" width=49% alt="Average bandwidth performance of `strcpy` (unaligned data)">
   <img src="plots/full_sizes/align/strcpy_libc.png" align="right" width=49% alt="Average bandwidth performance of `strcpy` (aligned data)">
 </p>
 
@@ -133,12 +133,14 @@ However, we think this is worth merging into AOR/libc as the overall performance
 
 ### `strncpy`
 
+Our implementation of `strncpy` largely beats GNU libc in almost all scenarios. Just like `strcpy`, some sizes are problematic for short, unaligned strings. However, this isn't as problematic as the SVE-implementation pretty much matches the performance of the glibc, even on the worst-case string lengths. On larger data, we easily outperform the current implementation.
+
 <p>
-  <img src="plots/short_strs/noalign/strncpy_libc.png" width=49% alt="Average bandwidth performance of `strncpy` on short strings (non-aligned data)">
+  <img src="plots/short_strs/noalign/strncpy_libc.png" width=49% alt="Average bandwidth performance of `strncpy` on short strings (unaligned data)">
   <img src="plots/short_strs/align/strncpy_libc.png" align="right" width=49% alt="Average bandwidth performance of `strncpy` on short strings (aligned data)">
 </p>
 <p>
-  <img src="plots/full_sizes/noalign/strncpy_libc.png" width=49% alt="Average bandwidth performance of `strncpy` (non-aligned data)">
+  <img src="plots/full_sizes/noalign/strncpy_libc.png" width=49% alt="Average bandwidth performance of `strncpy` (unaligned data)">
   <img src="plots/full_sizes/align/strncpy_libc.png" align="right" width=49% alt="Average bandwidth performance of `strncpy` (aligned data)">
 </p>
 
@@ -146,12 +148,14 @@ However, we think this is worth merging into AOR/libc as the overall performance
 
 ### `strcmp`
 
+For routines that don't need to write data to memory (i.e., no stores required) such as `strcmp`, we do not experience any slowdowns, even on unaligned data. Our implementation is thus better than the current GNU libc in all cases.
+
 <p>
-  <img src="plots/short_strs/noalign/strcmp_libc.png" width=49% alt="Average bandwidth performance of `strcmp` on short strings (non-aligned data)">
+  <img src="plots/short_strs/noalign/strcmp_libc.png" width=49% alt="Average bandwidth performance of `strcmp` on short strings (unaligned data)">
   <img src="plots/short_strs/align/strcmp_libc.png" align="right" width=49% alt="Average bandwidth performance of `strcmp` on short strings (aligned data)">
 </p>
 <p>
-  <img src="plots/full_sizes/noalign/strcmp_libc.png" width=49% alt="Average bandwidth performance of `strcmp` (non-aligned data)">
+  <img src="plots/full_sizes/noalign/strcmp_libc.png" width=49% alt="Average bandwidth performance of `strcmp` (unaligned data)">
   <img src="plots/full_sizes/align/strcmp_libc.png" align="right" width=49% alt="Average bandwidth performance of `strcmp` (aligned data)">
 </p>
 
@@ -159,15 +163,20 @@ However, we think this is worth merging into AOR/libc as the overall performance
 
 ### `strncmp`
 
+Much like `strcmp`, our implementation of `strncmp` always performs better than glibc.
+
 <p>
-  <img src="plots/short_strs/noalign/strncmp_libc.png" width=49% alt="Average bandwidth performance of `strncmp` on short strings (non-aligned data)">
+  <img src="plots/short_strs/noalign/strncmp_libc.png" width=49% alt="Average bandwidth performance of `strncmp` on short strings (unaligned data)">
   <img src="plots/short_strs/align/strncmp_libc.png" align="right" width=49% alt="Average bandwidth performance of `strncmp` on short strings (aligned data)">
 </p>
 <p>
-  <img src="plots/full_sizes/noalign/strncmp_libc.png" width=49% alt="Average bandwidth performance of `strncmp` (non-aligned data)">
+  <img src="plots/full_sizes/noalign/strncmp_libc.png" width=49% alt="Average bandwidth performance of `strncmp` (unaligned data)">
   <img src="plots/full_sizes/align/strncmp_libc.png" align="right" width=49% alt="Average bandwidth performance of `strncmp` (aligned data)">
 
+
 ## Inconclusive results
+
+We include hereafter the bandwidth plots for other string routine implementations that yielded inconclusive results.
 
 <details>
 <summary>Click to expand</summary>
@@ -175,11 +184,11 @@ However, we think this is worth merging into AOR/libc as the overall performance
 ### `memcpy`
 
 <p>
-  <img src="plots/short_strs/noalign/memcpy_libc.png" width=49% alt="Average bandwidth performance of `memcpy` on short strings (non-aligned data)">
+  <img src="plots/short_strs/noalign/memcpy_libc.png" width=49% alt="Average bandwidth performance of `memcpy` on short strings (unaligned data)">
   <img align="right" src="plots/short_strs/align/memcpy_libc.png" width=49% alt="Average bandwidth performance of `memcpy` on short strings (aligned data)">
 </p>
 <p>
-  <img src="plots/full_sizes/noalign/memcpy_libc.png" width=49% alt="Average bandwidth performance of `memcpy` (non-aligned data)">
+  <img src="plots/full_sizes/noalign/memcpy_libc.png" width=49% alt="Average bandwidth performance of `memcpy` (unaligned data)">
   <img align="right" src="plots/full_sizes/align/memcpy_libc.png" width=49% alt="Average bandwidth performance of `memcpy` (aligned data)">
 </p>
 
@@ -188,11 +197,11 @@ However, we think this is worth merging into AOR/libc as the overall performance
 ### `memcmp`
 
 <p>
-  <img src="plots/short_strs/noalign/memcmp_libc.png" width=49% alt="Average bandwidth performance of `memcmp` on short strings (non-aligned data)">
+  <img src="plots/short_strs/noalign/memcmp_libc.png" width=49% alt="Average bandwidth performance of `memcmp` on short strings (unaligned data)">
   <img align="right" src="plots/short_strs/align/memcmp_libc.png" width=49% alt="Average bandwidth performance of `memcmp` on short strings (aligned data)">
 </p>
 <p>
-  <img src="plots/full_sizes/noalign/memcmp_libc.png" width=49% alt="Average bandwidth performance of `memcmp` (non-aligned data)">
+  <img src="plots/full_sizes/noalign/memcmp_libc.png" width=49% alt="Average bandwidth performance of `memcmp` (unaligned data)">
   <img align="right" src="plots/full_sizes/align/memcmp_libc.png" width=49% alt="Average bandwidth performance of `memcmp` (aligned data)">
 </p>
 
@@ -200,17 +209,52 @@ However, we think this is worth merging into AOR/libc as the overall performance
 
 ### `strlen`
 
+<p>
+  <img src="plots/short_strs/noalign/strlen_libc.png" width=49% alt="Average bandwidth performance of `strlen` on short strings (unaligned data)">
+  <img align="right" src="plots/short_strs/align/strlen_libc.png" width=49% alt="Average bandwidth performance of `strlen` on short strings (aligned data)">
+</p>
+<p>
+  <img src="plots/full_sizes/noalign/strlen_libc.png" width=49% alt="Average bandwidth performance of `strlen` (unaligned data)">
+  <img align="right" src="plots/full_sizes/align/strlen_libc.png" width=49% alt="Average bandwidth performance of `strlen` (aligned data)">
+</p>
+
 ---
 
 ### `strnlen`
+
+<p>
+  <img src="plots/short_strs/noalign/strnlen_libc.png" width=49% alt="Average bandwidth performance of `strnlen` on short strings (unaligned data)">
+  <img align="right" src="plots/short_strs/align/strnlen_libc.png" width=49% alt="Average bandwidth performance of `strnlen` on short strings (aligned data)">
+</p>
+<p>
+  <img src="plots/full_sizes/noalign/strnlen_libc.png" width=49% alt="Average bandwidth performance of `strnlen` (unaligned data)">
+  <img align="right" src="plots/full_sizes/align/strnlen_libc.png" width=49% alt="Average bandwidth performance of `strnlen` (aligned data)">
+</p>
 
 ---
 
 ### `strchr`
 
+<p>
+  <img src="plots/short_strs/noalign/strchr_libc.png" width=49% alt="Average bandwidth performance of `strchr` on short strings (unaligned data)">
+  <img align="right" src="plots/short_strs/align/strchr_libc.png" width=49% alt="Average bandwidth performance of `strchr` on short strings (aligned data)">
+</p>
+<p>
+  <img src="plots/full_sizes/noalign/strchr_libc.png" width=49% alt="Average bandwidth performance of `strchr` (unaligned data)">
+  <img align="right" src="plots/full_sizes/align/strchr_libc.png" width=49% alt="Average bandwidth performance of `strchr` (aligned data)">
+</p>
+
 ---
 
 ### `strrchr`
 
+<p>
+  <img src="plots/short_strs/noalign/strrchr_libc.png" width=49% alt="Average bandwidth performance of `strrchr` on short strings (unaligned data)">
+  <img align="right" src="plots/short_strs/align/strrchr_libc.png" width=49% alt="Average bandwidth performance of `strrchr` on short strings (aligned data)">
+</p>
+<p>
+  <img src="plots/full_sizes/noalign/strrchr_libc.png" width=49% alt="Average bandwidth performance of `strrchr` (unaligned data)">
+  <img align="right" src="plots/full_sizes/align/strrchr_libc.png" width=49% alt="Average bandwidth performance of `strrchr` (aligned data)">
+</p>
 
 </details>
