@@ -45,23 +45,8 @@
 /// Max string length in bytes for `SMALL_STR`
 #define MAX_LEN_IN_BYTES 128ULL
 
-/// Size in bytes of half the L1D cache on Neoverse V1
-#define HALF_L1D 32768ULL
-/// Size in bytes of the L1D cache on Neoverse V1
-#define FULL_L1D 65536ULL
-/// Size in bytes of half the L2 cache on Neoverse V1
-#define HALF_L2 524288ULL
-/// Size in bytes of the L2 cache on Neoverse V1
-#define FULL_L2 1048576ULL
-/// Size in bytes of half the L3 cache on Neoverse V1
-#define HALF_L3 16777216ULL
-/// Size in bytes of the L3 cache on Neoverse V1
-#define FULL_L3 33554432ULL
-/// Size in bytes of 8x the L3 cache on Neoverse V1 (guaranteed in RAM)
-#define DRAM 268435456ULL
-
 // Define `SMALL_STR` if nothing defined by the user
-#if !defined(SMALL_STR) && !defined(CACHE_SIZES) && !defined(TEST)
+#if !defined(SMALL_STR) && !defined(FULL_SIZES)
 #define SMALL_STR
 #endif
 
@@ -77,7 +62,7 @@ void bench_memcmp(size_t nbench, size_t const buf_sizes[nbench], size_t const be
         // Benchmark initialization
         benchmark_t memcmp_bench = {
 #ifdef CMP_LIBC
-            .name_old = "memcmp (GNU libc " xstr(__GLIBC__) "." xstr(__GLIBC_MINOR__) ")",
+            .name_old = "memcmp (GNU libc 2.39)",
 #else
             .name_old = "memcmp (Arm OR 23.01)",
 #endif
@@ -88,10 +73,10 @@ void bench_memcmp(size_t nbench, size_t const buf_sizes[nbench], size_t const be
         };
 
         // Random memory initialization
-        char *s1 = alloc(buf_sizes[b] + 1);
-        char *s2 = alloc(buf_sizes[b] + 1);
-        init_buf_rand(buf_sizes[b], &s1, false);
-        init_buf_copy(buf_sizes[b], &s2, s1); // Make data identical to avoid early function exit
+        char* s1 = alloc(buf_sizes[b] + 1);
+        char* s2 = alloc(buf_sizes[b] + 1);
+        init_buf_rand(buf_sizes[b], s1, false);
+        init_buf_copy(buf_sizes[b], s2, s1); // Make data identical to avoid early function exit
 
 #ifdef DEBUG
         fprintf(stderr, "Checking `new_memcmp_aarch64_sve`... ");
@@ -134,7 +119,7 @@ void bench_memcpy(size_t nbench, size_t const buf_sizes[nbench], size_t const be
         // Benchmark initialization
         benchmark_t memcpy_bench = {
 #ifdef CMP_LIBC
-            .name_old = "memcpy (GNU libc " xstr(__GLIBC__) "." xstr(__GLIBC_MINOR__) ")",
+            .name_old = "memcpy (GNU libc 2.39)",
 #else
             .name_old = "memcpy (Arm OR 23.01)",
 #endif
@@ -145,9 +130,9 @@ void bench_memcpy(size_t nbench, size_t const buf_sizes[nbench], size_t const be
         };
 
         // Random char initialization
-        char *src = alloc(buf_sizes[b] + 1);
-        char *dst = alloc(buf_sizes[b] + 1);
-        init_buf_rand(buf_sizes[b], &src, false);
+        char* src = alloc(buf_sizes[b] + 1);
+        char* dst = alloc(buf_sizes[b] + 1);
+        init_buf_rand(buf_sizes[b], src, false);
 
 #ifdef DEBUG
         fprintf(stderr, "Checking `new_memcpy_aarch64_sve`... ");
@@ -188,21 +173,21 @@ void bench_strcmp(size_t nbench, size_t const buf_sizes[nbench], size_t const be
         // Benchmark initialization
         benchmark_t strcmp_bench = {
 #ifdef CMP_LIBC
-            .name_old = "strcmp GNU libc " xstr(__GLIBC__) "." xstr(__GLIBC_MINOR__),
+            .name_old = "strcmp (GNU libc 2.39)",
 #else
-            .name_old = "strcmp Arm optimized-routines",
+            .name_old = "strcmp (Arm OR 23.01)",
 #endif
-            .name_new = "strcmp LI-PaRAD/EMOPASS",
+            .name_new = "strcmp (LI-PaRAD)",
             .nsamples = NSAMPLES,
             .nreps = bench_reps[b],
             .buf_size = buf_sizes[b],
         };
 
         // Random ASCII initialization
-        char *s1 = alloc(buf_sizes[b] + 1);
-        char *s2 = alloc(buf_sizes[b] + 1);
-        init_buf_rand(buf_sizes[b], &s1, true);
-        init_buf_copy(buf_sizes[b], &s2, s1);
+        char* s1 = alloc(buf_sizes[b] + 1);
+        char* s2 = alloc(buf_sizes[b] + 1);
+        init_buf_rand(buf_sizes[b], s1, true);
+        init_buf_copy(buf_sizes[b], s2, s1);
 
 #ifdef DEBUG
         fprintf(stderr, "Checking `new_strcmp_aarch64_sve`\n");
@@ -244,21 +229,21 @@ void bench_strncmp(size_t nbench, size_t const buf_sizes[nbench], size_t const b
         // Benchmark initialization
         benchmark_t strncmp_bench = {
 #ifdef CMP_LIBC
-            .name_old = "strncmp GNU libc " xstr(__GLIBC__) "." xstr(__GLIBC_MINOR__),
+            .name_old = "strncmp (GNU libc 2.39)",
 #else
-            .name_old = "strncmp Arm optimized-routines",
+            .name_old = "strncmp (Arm OR 23.01)",
 #endif
-            .name_new = "strncmp LI-PaRAD/EMOPASS",
+            .name_new = "strncmp (LI-PaRAD)",
             .nsamples = NSAMPLES,
             .nreps = bench_reps[b],
             .buf_size = buf_sizes[b],
         };
 
         // Random ASCII initialization
-        char *s1 = alloc(buf_sizes[b] + 1);
-        char *s2 = alloc(buf_sizes[b] + 1);
-        init_buf_rand(buf_sizes[b], &s1, true);
-        init_buf_copy(buf_sizes[b], &s2, s1);
+        char* s1 = alloc(buf_sizes[b] + 1);
+        char* s2 = alloc(buf_sizes[b] + 1);
+        init_buf_rand(buf_sizes[b], s1, true);
+        init_buf_copy(buf_sizes[b], s2, s1);
 
 #ifdef DEBUG
         fprintf(stderr, "Checking `new_strncmp_aarch64_sve`\n");
@@ -300,19 +285,19 @@ void bench_strchr(size_t nbench, size_t const buf_sizes[nbench], size_t const be
         // Benchmark initialization
         benchmark_t strchr_bench = {
 #ifdef CMP_LIBC
-            .name_old = "strchr GNU libc " xstr(__GLIBC__) "." xstr(__GLIBC_MINOR__),
+            .name_old = "strchr (GNU libc 2.39)",
 #else
-            .name_old = "strchr Arm optimized-routines",
+            .name_old = "strchr (Arm OR 23.01)",
 #endif
-            .name_new = "strchr LI-PaRAD/EMOPASS",
+            .name_new = "strchr (LI-PaRAD)",
             .nsamples = NSAMPLES,
             .nreps = bench_reps[b],
             .buf_size = buf_sizes[b],
         };
 
         // Random ASCII initialization
-        char *s = alloc(buf_sizes[b] + 1);
-        init_buf_rand(buf_sizes[b], &s, true);
+        char* s = alloc(buf_sizes[b] + 1);
+        init_buf_rand(buf_sizes[b], s, true);
         int32_t c = 0; // Look for '\0'
 
 #ifdef DEBUG
@@ -351,19 +336,19 @@ void bench_strrchr(size_t nbench, size_t const buf_sizes[nbench], size_t const b
         // Benchmark initialization
         benchmark_t strrchr_bench = {
 #ifdef CMP_LIBC
-            .name_old = "strrchr GNU libc " xstr(__GLIBC__) "." xstr(__GLIBC_MINOR__),
+            .name_old = "strrchr (GNU libc 2.39)",
 #else
-            .name_old = "strrchr Arm optimized-routines",
+            .name_old = "strrchr (Arm OR 23.01)",
 #endif
-            .name_new = "strrchr LI-PaRAD/EMOPASS",
+            .name_new = "strrchr (LI-PaRAD)",
             .nsamples = NSAMPLES,
             .nreps = bench_reps[b],
             .buf_size = buf_sizes[b],
         };
 
         // Random ASCII initialization
-        char *s = alloc(buf_sizes[b] + 1);
-        init_buf_rand(buf_sizes[b], &s, true);
+        char* s = alloc(buf_sizes[b] + 1);
+        init_buf_rand(buf_sizes[b], s, true);
         int32_t c = 0; // Look for '\0'
 
 #ifdef DEBUG
@@ -405,20 +390,20 @@ void bench_strcpy(size_t nbench, size_t const buf_sizes[nbench], size_t const be
         // Benchmark initialization
         benchmark_t strcpy_bench = {
 #ifdef CMP_LIBC
-            .name_old = "strcpy GNU libc " xstr(__GLIBC__) "." xstr(__GLIBC_MINOR__),
+            .name_old = "strcpy (GNU libc 2.39)",
 #else
-            .name_old = "strcpy Arm optimized-routines",
+            .name_old = "strcpy (Arm OR 23.01)",
 #endif
-            .name_new = "strcpy LI-PaRAD/EMOPASS",
+            .name_new = "strcpy (LI-PaRAD)",
             .nsamples = NSAMPLES,
             .nreps = bench_reps[b],
             .buf_size = buf_sizes[b],
         };
 
         // Random ASCII initialization
-        char *src = alloc(buf_sizes[b] + 1);
-        char *dst = alloc(buf_sizes[b] + 1);
-        init_buf_rand(buf_sizes[b], &src, true);
+        char* src = alloc(buf_sizes[b] + 1);
+        char* dst = alloc(buf_sizes[b] + 1);
+        init_buf_rand(buf_sizes[b], src, true);
 
 #ifdef DEBUG
         fprintf(stderr, "Checking `new_strcpy_aarch64_sve`\n");
@@ -458,20 +443,20 @@ void bench_strncpy(size_t nbench, size_t const buf_sizes[nbench], size_t const b
         // Benchmark initialization
         benchmark_t strncpy_bench = {
 #ifdef CMP_LIBC
-            .name_old = "strncpy GNU libc " xstr(__GLIBC__) "." xstr(__GLIBC_MINOR__),
+            .name_old = "strncpy (GNU libc 2.39)",
 #else
-            .name_old = "strncpy Arm optimized-routines",
+            .name_old = "strncpy (Arm OR 23.01)",
 #endif
-            .name_new = "strncpy LI-PaRAD/EMOPASS",
+            .name_new = "strncpy (LI-PaRAD)",
             .nsamples = NSAMPLES,
             .nreps = bench_reps[b],
             .buf_size = buf_sizes[b],
         };
 
         // Random ASCII initialization
-        char *src = alloc(buf_sizes[b] + 1);
-        char *dst = alloc(buf_sizes[b] + 1);
-        init_buf_rand(buf_sizes[b], &src, true);
+        char* src = alloc(buf_sizes[b] + 1);
+        char* dst = alloc(buf_sizes[b] + 1);
+        init_buf_rand(buf_sizes[b], src, true);
 
 #ifdef DEBUG
         fprintf(stderr, "Checking `new_strncpy_aarch64_sve`\n");
@@ -507,19 +492,19 @@ void bench_strlen(size_t nbench, size_t const buf_sizes[nbench], size_t const be
         // Benchmark initialization
         benchmark_t strlen_bench = {
 #ifdef CMP_LIBC
-            .name_old = "strlen GNU libc " xstr(__GLIBC__) "." xstr(__GLIBC_MINOR__),
+            .name_old = "strlen (GNU libc 2.39)",
 #else
-            .name_old = "strlen Arm optimized-routines",
+            .name_old = "strlen (Arm OR 23.01)",
 #endif
-            .name_new = "strlen LI-PaRAD/EMOPASS",
+            .name_new = "strlen (LI-PaRAD)",
             .nsamples = NSAMPLES,
             .nreps = bench_reps[b],
             .buf_size = buf_sizes[b],
         };
 
         // Random ASCII initialization
-        char *s = alloc(buf_sizes[b] + 1);
-        init_buf_rand(buf_sizes[b], &s, true);
+        char* s = alloc(buf_sizes[b] + 1);
+        init_buf_rand(buf_sizes[b], s, true);
 
 #ifdef DEBUG
         fprintf(stderr, "Checking `new_strlen_aarch64_sve`\n");
@@ -557,19 +542,19 @@ void bench_strnlen(size_t nbench, size_t const buf_sizes[nbench], size_t const b
         // Benchmark initialization
         benchmark_t strnlen_bench = {
 #ifdef CMP_LIBC
-            .name_old = "strnlen GNU libc " xstr(__GLIBC__) "." xstr(__GLIBC_MINOR__),
+            .name_old = "strnlen (GNU libc 2.39)",
 #else
-            .name_old = "strnlen Arm optimized-routines",
+            .name_old = "strnlen (Arm OR 23.01)",
 #endif
-            .name_new = "strnlen LI-PaRAD/EMOPASS",
+            .name_new = "strnlen (LI-PaRAD)",
             .nsamples = NSAMPLES,
             .nreps = bench_reps[b],
             .buf_size = buf_sizes[b],
         };
 
         // Random ASCII initialization
-        char *s = alloc(buf_sizes[b] + 1);
-        init_buf_rand(buf_sizes[b], &s, true);
+        char* s = alloc(buf_sizes[b] + 1);
+        init_buf_rand(buf_sizes[b], s, true);
 
 #ifdef DEBUG
         fprintf(stderr, "Checking `new_strnlen_aarch64_sve`\n");
@@ -621,12 +606,12 @@ int32_t main(int32_t argc, char *argv[argc + 1]) {
     };
 #elif defined(TEST)
     size_t buf_sizes[] = {
-        512, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072, 262144, 524288, 1048576, 2097152,
-        4194304, 8388608, 16777216, 33554432, 67108864,
+        64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, HALF_L1D, FULL_L1D, 131072, 262144,
+        HALF_L2, FULL_L2, 2097152, 4194304, 8388608, HALF_L3, FULL_L3, 67108864,
     };
     size_t bench_reps[] = {
-        100000, 100000, 100000, 10000, 10000, 10000, 1000, 1000, 1000, 100, 100, 100, 10, 10, 10, 2,
-        2, 2,
+        1000000, 1000000, 1000000, 100000, 100000, 100000, 10000, 10000, 10000, 1000, 1000, 1000,
+        100, 100, 100, 10, 10, 10, 2, 2, 2,
     };
 #endif
 
@@ -706,5 +691,5 @@ int32_t main(int32_t argc, char *argv[argc + 1]) {
     return 0;
 }
 #else
-#error "Target CPU must support the Arm SVE extension"
+#error "Target CPU must support the (Arm OR 23.01)"
 #endif

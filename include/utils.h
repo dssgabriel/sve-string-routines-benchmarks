@@ -24,9 +24,6 @@
 
 #include <time.h>
 
-#define xstr(s) str(s)
-#define str(s) #s
-
 /// Compute elapsed time in nanoseconds between two `struct timespec` points in time.
 double elapsed_ns(struct timespec a, struct timespec b);
 
@@ -37,10 +34,10 @@ double ns_to_s(double ns);
 int32_t cmp_double(void const* a, void const* b);
 
 /// Random buffer initialization helper.
-void init_buf_rand(size_t n, char** buf, bool is_str);
+void init_buf_rand(size_t n, char* buf, bool is_str);
 
 /// Buffer copy helper.
-void init_buf_copy(size_t n, char** buf_dst, char const* buf_src);
+void init_buf_copy(size_t n, char* buf_dst, char const* buf_src);
 
 /// Prints program help.
 void help(void);

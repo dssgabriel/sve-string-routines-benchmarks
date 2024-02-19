@@ -28,7 +28,7 @@
 #define BIN_NAME "bench-sve-string-routines"
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 5
-#define VERSION_PATCH 0
+#define VERSION_PATCH 1
 
 inline double elapsed_ns(struct timespec a, struct timespec b) {
     return (double)(b.tv_sec - a.tv_sec) * 1.0e+9 + (double)(b.tv_nsec - a.tv_nsec);
@@ -49,30 +49,30 @@ int32_t cmp_double(void const* a, void const* b) {
 }
 
 // Assumes buffer has allocated size `n + 1`
-inline void init_buf_rand(size_t n, char** buf, bool is_str) {
-    assert(*buf != NULL && "buffer cannot be nullptr");
+inline void init_buf_rand(size_t n, char* buf, bool is_str) {
+    assert(buf != NULL && "buffer cannot be nullptr");
     if (is_str) {
         for (size_t i = 0; i < n; ++i) {
             // Random alphanumeric character
-            *buf[i] = (char)(rand() % 95 + 32);
+            buf[i] = (char)(rand() % 95 + 32);
         }
     } else {
         for (size_t i = 0; i < n; ++i) {
             // Random non-null ASCII character
-            *buf[i] = (char)(rand() % 126 + 1);
+            buf[i] = (char)(rand() % 126 + 1);
         }
     }
-    *buf[n] = '\0';
+    buf[n] = '\0';
 }
 
 // Assumes both buffers have the same length `n` (and allocated size `n + 1`)
-inline void init_buf_copy(size_t n, char** buf_dst, char const* buf_src) {
-    assert(*buf_dst != NULL && "destination buffer cannot be nullptr");
+inline void init_buf_copy(size_t n, char* buf_dst, char const* buf_src) {
+    assert(buf_dst != NULL && "destination buffer cannot be nullptr");
     assert(buf_src != NULL && "source buffer cannot be nullptr");
     for (size_t i = 0; i < n; ++i) {
-        *buf_dst[i] = buf_src[i];
+        buf_dst[i] = buf_src[i];
     }
-    *buf_dst[n] = '\0';
+    buf_dst[n] = '\0';
 }
 
 void help(void) {
