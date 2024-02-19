@@ -133,7 +133,7 @@ However, we think this is worth merging into AOR/libc as the overall performance
 
 ### `strncpy`
 
-Our implementation of `strncpy` largely beats GNU libc in almost all scenarios. Just like `strcpy`, some sizes are problematic for short, unaligned strings. However, this isn't as problematic as the SVE-implementation pretty much matches the performance of the glibc, even on the worst-case string lengths. On larger data, we easily outperform the current implementation.
+Our implementation of `strncpy` largely beats GNU libc in almost all scenarios. Just like `strcpy`, some sizes are problematic for short, unaligned strings. However, this isn't as problematic as the SVE implementation matches the performance of the glibc, even on the worst-case string lengths. On larger data, we easily outperform the current implementation.
 
 <p>
   <img src="plots/short_strs/noalign/strncpy_libc.png" width=49% alt="Average bandwidth performance of `strncpy` on short strings (unaligned data)">
@@ -148,7 +148,7 @@ Our implementation of `strncpy` largely beats GNU libc in almost all scenarios. 
 
 ### `strcmp`
 
-For routines that don't need to write data to memory (i.e., no stores required) such as `strcmp`, we do not experience any slowdowns, even on unaligned data. Our implementation is thus better than the current GNU libc in all cases.
+For routines that don't need to write data to memory (i.e., no store instructions required), such as `strcmp`, we do not experience any slowdowns, even on unaligned data. Our implementation is thus better than the current GNU libc in all cases, except for string sizes in the ranges 1-16 bytes and 32-48 bytes, where we remain marginally slower than the NEON implementation from libc.
 
 <p>
   <img src="plots/short_strs/noalign/strcmp_libc.png" width=49% alt="Average bandwidth performance of `strcmp` on short strings (unaligned data)">
@@ -163,7 +163,7 @@ For routines that don't need to write data to memory (i.e., no stores required) 
 
 ### `strncmp`
 
-Much like `strcmp`, our implementation of `strncmp` always performs better than glibc.
+Much like `strcmp`, our implementation of `strncmp` always performs better than glibc, except for string lengths in the range of 1-16 bytes, where we are very slightly behind.
 
 <p>
   <img src="plots/short_strs/noalign/strncmp_libc.png" width=49% alt="Average bandwidth performance of `strncmp` on short strings (unaligned data)">
