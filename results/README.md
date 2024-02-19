@@ -113,112 +113,104 @@ Compared to Arm's optimized-routines implementations, we've removed any dependen
 
 The following plots present the comparative bandwidth performance between implementations for each routine, with the current implementation in blue, and our optimized version in yellow:
 
-### `memcpy`
-
-![Average bandwidth performance of `memcpy` on short strings (non-aligned data)](https://github.com/dssgabriel/sve-string-routines-benchmarks/blob/main/results/plots/short_strs/noalign/memcpy_libc.png)
-
-![Average bandwidth performance of `memcpy` on short strings (aligned data)](https://github.com/dssgabriel/sve-string-routines-benchmarks/blob/main/results/plots/short_strs/align/memcpy_libc.png)
-
-![Average bandwidth performance of `memcpy` (non-aligned data)](https://github.com/dssgabriel/sve-string-routines-benchmarks/blob/main/results/plots/full_sizes/noalign/memcpy_libc.png)
-
-![Average bandwidth performance of `memcpy` (aligned data)](https://github.com/dssgabriel/sve-string-routines-benchmarks/blob/main/results/plots/full_sizes/align/memcpy_libc.png)
-
-
 ### `strcpy`
 
-![Average bandwidth performance of `strcpy` on short strings (non-aligned data)](https://github.com/dssgabriel/sve-string-routines-benchmarks/blob/main/results/plots/short_strs/noalign/strcpy_libc.png)
+Our implementation of `strcpy` is significantly faster than the latest (at the time of writing) GNU libc, especially on larger strings.   
+On short strings, some specific string lengths show noticeable performance drops when the data is not aligned. This behavior is strange and would require further investigation, ideally on different hardware than AWS Graviton3/3E.
 
-![Average bandwidth performance of `strcpy` on short strings (aligned data)](https://github.com/dssgabriel/sve-string-routines-benchmarks/blob/main/results/plots/short_strs/align/strcpy_libc.png)
+However, we think this is worth merging into AOR/libc as the overall performance gains largely outweigh the losses shown on some short string lengths with unaligned data. 
 
-![Average bandwidth performance of `strcpy` (non-aligned data)](https://github.com/dssgabriel/sve-string-routines-benchmarks/blob/main/results/plots/full_sizes/noalign/strcpy_libc.png)
+<p>
+  <img src="plots/short_strs/noalign/strcpy_libc.png" width=49% alt="Average bandwidth performance of `strcpy` on short strings (non-aligned data)">
+  <img src="plots/short_strs/align/strcpy_libc.png" align="right" width=49% alt="Average bandwidth performance of `strcpy` on short strings (aligned data)">
+</p>
+<p>
+  <img src="plots/full_sizes/noalign/strcpy_libc.png" width=49% alt="Average bandwidth performance of `strcpy` (non-aligned data)">
+  <img src="plots/full_sizes/align/strcpy_libc.png" align="right" width=49% alt="Average bandwidth performance of `strcpy` (aligned data)">
+</p>
 
-![Average bandwidth performance of `strcpy` (aligned data)](https://github.com/dssgabriel/sve-string-routines-benchmarks/blob/main/results/plots/full_sizes/align/strcpy_libc.png)
-
+---
 
 ### `strncpy`
 
-![Average bandwidth performance of `strncpy` on short strings (non-aligned data)](https://github.com/dssgabriel/sve-string-routines-benchmarks/blob/main/results/plots/short_strs/noalign/strncpy_libc.png)
+<p>
+  <img src="plots/short_strs/noalign/strncpy_libc.png" width=49% alt="Average bandwidth performance of `strncpy` on short strings (non-aligned data)">
+  <img src="plots/short_strs/align/strncpy_libc.png" align="right" width=49% alt="Average bandwidth performance of `strncpy` on short strings (aligned data)">
+</p>
+<p>
+  <img src="plots/full_sizes/noalign/strncpy_libc.png" width=49% alt="Average bandwidth performance of `strncpy` (non-aligned data)">
+  <img src="plots/full_sizes/align/strncpy_libc.png" align="right" width=49% alt="Average bandwidth performance of `strncpy` (aligned data)">
+</p>
 
-![Average bandwidth performance of `strncpy` on short strings (aligned data)](https://github.com/dssgabriel/sve-string-routines-benchmarks/blob/main/results/plots/short_strs/align/strncpy_libc.png)
-
-![Average bandwidth performance of `strncpy` (non-aligned data)](https://github.com/dssgabriel/sve-string-routines-benchmarks/blob/main/results/plots/full_sizes/noalign/strncpy_libc.png)
-
-![Average bandwidth performance of `strncpy` (aligned data)](https://github.com/dssgabriel/sve-string-routines-benchmarks/blob/main/results/plots/full_sizes/align/strncpy_libc.png)
-
-
-### `memcmp`
-
-![Average bandwidth performance of `memcmp` on short strings (non-aligned data)](https://github.com/dssgabriel/sve-string-routines-benchmarks/blob/main/results/plots/short_strs/noalign/memcmp_libc.png)
-
-![Average bandwidth performance of `memcmp` on short strings (aligned data)](https://github.com/dssgabriel/sve-string-routines-benchmarks/blob/main/results/plots/short_strs/align/memcmp_libc.png)
-
-![Average bandwidth performance of `memcmp` (non-aligned data)](https://github.com/dssgabriel/sve-string-routines-benchmarks/blob/main/results/plots/full_sizes/noalign/memcmp_libc.png)
-
-![Average bandwidth performance of `memcmp` (aligned data)](https://github.com/dssgabriel/sve-string-routines-benchmarks/blob/main/results/plots/full_sizes/align/memcmp_libc.png)
-
+---
 
 ### `strcmp`
 
-![Average bandwidth performance of `strcmp` on short strings (non-aligned data)](https://github.com/dssgabriel/sve-string-routines-benchmarks/blob/main/results/plots/short_strs/noalign/strcmp_libc.png)
+<p>
+  <img src="plots/short_strs/noalign/strcmp_libc.png" width=49% alt="Average bandwidth performance of `strcmp` on short strings (non-aligned data)">
+  <img src="plots/short_strs/align/strcmp_libc.png" align="right" width=49% alt="Average bandwidth performance of `strcmp` on short strings (aligned data)">
+</p>
+<p>
+  <img src="plots/full_sizes/noalign/strcmp_libc.png" width=49% alt="Average bandwidth performance of `strcmp` (non-aligned data)">
+  <img src="plots/full_sizes/align/strcmp_libc.png" align="right" width=49% alt="Average bandwidth performance of `strcmp` (aligned data)">
+</p>
 
-![Average bandwidth performance of `strcmp` on short strings (aligned data)](https://github.com/dssgabriel/sve-string-routines-benchmarks/blob/main/results/plots/short_strs/align/strcmp_libc.png)
-
-![Average bandwidth performance of `strcmp` (non-aligned data)](https://github.com/dssgabriel/sve-string-routines-benchmarks/blob/main/results/plots/full_sizes/noalign/strcmp_libc.png)
-
-![Average bandwidth performance of `strcmp` (aligned data)](https://github.com/dssgabriel/sve-string-routines-benchmarks/blob/main/results/plots/full_sizes/align/strcmp_libc.png)
-
+---
 
 ### `strncmp`
 
-![Average bandwidth performance of `strncmp` on short strings (non-aligned data)](https://github.com/dssgabriel/sve-string-routines-benchmarks/blob/main/results/plots/short_strs/noalign/strncmp_libc.png)
+<p>
+  <img src="plots/short_strs/noalign/strncmp_libc.png" width=49% alt="Average bandwidth performance of `strncmp` on short strings (non-aligned data)">
+  <img src="plots/short_strs/align/strncmp_libc.png" align="right" width=49% alt="Average bandwidth performance of `strncmp` on short strings (aligned data)">
+</p>
+<p>
+  <img src="plots/full_sizes/noalign/strncmp_libc.png" width=49% alt="Average bandwidth performance of `strncmp` (non-aligned data)">
+  <img src="plots/full_sizes/align/strncmp_libc.png" align="right" width=49% alt="Average bandwidth performance of `strncmp` (aligned data)">
 
-![Average bandwidth performance of `strncmp` on short strings (aligned data)](https://github.com/dssgabriel/sve-string-routines-benchmarks/blob/main/results/plots/short_strs/align/strncmp_libc.png)
+## Inconclusive results
 
-![Average bandwidth performance of `strncmp` (non-aligned data)](https://github.com/dssgabriel/sve-string-routines-benchmarks/blob/main/results/plots/full_sizes/noalign/strncmp_libc.png)
+<details>
+<summary>Click to expand</summary>
 
-![Average bandwidth performance of `strncmp` (aligned data)](https://github.com/dssgabriel/sve-string-routines-benchmarks/blob/main/results/plots/full_sizes/align/strncmp_libc.png)
+### `memcpy`
 
+<p>
+  <img src="plots/short_strs/noalign/memcpy_libc.png" width=49% alt="Average bandwidth performance of `memcpy` on short strings (non-aligned data)">
+  <img align="right" src="plots/short_strs/align/memcpy_libc.png" width=49% alt="Average bandwidth performance of `memcpy` on short strings (aligned data)">
+</p>
+<p>
+  <img src="plots/full_sizes/noalign/memcpy_libc.png" width=49% alt="Average bandwidth performance of `memcpy` (non-aligned data)">
+  <img align="right" src="plots/full_sizes/align/memcpy_libc.png" width=49% alt="Average bandwidth performance of `memcpy` (aligned data)">
+</p>
+
+---
+
+### `memcmp`
+
+<p>
+  <img src="plots/short_strs/noalign/memcmp_libc.png" width=49% alt="Average bandwidth performance of `memcmp` on short strings (non-aligned data)">
+  <img align="right" src="plots/short_strs/align/memcmp_libc.png" width=49% alt="Average bandwidth performance of `memcmp` on short strings (aligned data)">
+</p>
+<p>
+  <img src="plots/full_sizes/noalign/memcmp_libc.png" width=49% alt="Average bandwidth performance of `memcmp` (non-aligned data)">
+  <img align="right" src="plots/full_sizes/align/memcmp_libc.png" width=49% alt="Average bandwidth performance of `memcmp` (aligned data)">
+</p>
+
+---
 
 ### `strlen`
 
-![Average bandwidth performance of `strlen` on short strings (non-aligned data)](https://github.com/dssgabriel/sve-string-routines-benchmarks/blob/main/results/plots/short_strs/noalign/strlen_libc.png)
-
-![Average bandwidth performance of `strlen` on short strings (aligned data)](https://github.com/dssgabriel/sve-string-routines-benchmarks/blob/main/results/plots/short_strs/align/strlen_libc.png)
-
-![Average bandwidth performance of `strlen` (non-aligned data)](https://github.com/dssgabriel/sve-string-routines-benchmarks/blob/main/results/plots/full_sizes/noalign/strlen_libc.png)
-
-![Average bandwidth performance of `strlen` (aligned data)](https://github.com/dssgabriel/sve-string-routines-benchmarks/blob/main/results/plots/full_sizes/align/strlen_libc.png)
-
+---
 
 ### `strnlen`
 
-![Average bandwidth performance of `strnlen` on short strings (non-aligned data)](https://github.com/dssgabriel/sve-string-routines-benchmarks/blob/main/results/plots/short_strs/noalign/strnlen_libc.png)
-
-![Average bandwidth performance of `strnlen` on short strings (aligned data)](https://github.com/dssgabriel/sve-string-routines-benchmarks/blob/main/results/plots/short_strs/align/strnlen_libc.png)
-
-![Average bandwidth performance of `strnlen` (non-aligned data)](https://github.com/dssgabriel/sve-string-routines-benchmarks/blob/main/results/plots/full_sizes/noalign/strnlen_libc.png)
-
-![Average bandwidth performance of `strnlen` (aligned data)](https://github.com/dssgabriel/sve-string-routines-benchmarks/blob/main/results/plots/full_sizes/align/strnlen_libc.png)
-
+---
 
 ### `strchr`
 
-![Average bandwidth performance of `strchr` on short strings (non-aligned data)](https://github.com/dssgabriel/sve-string-routines-benchmarks/blob/main/results/plots/short_strs/noalign/strchr_libc.png)
-
-![Average bandwidth performance of `strchr` on short strings (aligned data)](https://github.com/dssgabriel/sve-string-routines-benchmarks/blob/main/results/plots/short_strs/align/strchr_libc.png)
-
-![Average bandwidth performance of `strchr` (non-aligned data)](https://github.com/dssgabriel/sve-string-routines-benchmarks/blob/main/results/plots/full_sizes/noalign/strchr_libc.png)
-
-![Average bandwidth performance of `strchr` (aligned data)](https://github.com/dssgabriel/sve-string-routines-benchmarks/blob/main/results/plots/full_sizes/align/strchr_libc.png)
-
+---
 
 ### `strrchr`
 
-![Average bandwidth performance of `strrchr` on short strings (non-aligned data)](https://github.com/dssgabriel/sve-string-routines-benchmarks/blob/main/results/plots/short_strs/noalign/strrchr_libc.png)
 
-![Average bandwidth performance of `strrchr` on short strings (aligned data)](https://github.com/dssgabriel/sve-string-routines-benchmarks/blob/main/results/plots/short_strs/align/strrchr_libc.png)
-
-![Average bandwidth performance of `strrchr` (non-aligned data)](https://github.com/dssgabriel/sve-string-routines-benchmarks/blob/main/results/plots/full_sizes/noalign/strrchr_libc.png)
-
-![Average bandwidth performance of `strrchr` (aligned data)](https://github.com/dssgabriel/sve-string-routines-benchmarks/blob/main/results/plots/full_sizes/align/strrchr_libc.png)
-
+</details>
