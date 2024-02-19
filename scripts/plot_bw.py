@@ -3,8 +3,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import os
 
-# import plotly.express as px
-
 
 def plot_bandwidth(args):
     input_file = args.input
@@ -13,12 +11,24 @@ def plot_bandwidth(args):
     match args.target:
         case "G3":
             target_hardware = "AWS Graviton3"
+            l1d = 65536
+            l2 = 1048576
+            l3 = 33554432
         case "G3E":
             target_hardware = "AWS Graviton3E"
+            l1d = 65536
+            l2 = 1048576
+            l3 = 33554432
         case "A64FX":
             target_hardware = "Fujitsu A64FX"
+            l1d = 65536
+            l2 = 838860
+            l3 = None
         case "Grace":
             target_hardware = "NVIDIA Grace"
+            l1d = 65536
+            l2 = 1048576
+            l3 = 245366784
         case "Rhea1":
             target_hardware = "SiPearl Rhea1"
         case _:
@@ -58,10 +68,11 @@ def plot_bandwidth(args):
     # Set title and labels
     ax.set_title(f"Average Bandwidth of `{routine_name}`\n", fontsize=24, loc="left")
     ax.text(
-        0.02,
-        1.02,
-        f"on {target_hardware}, "
-        f"{'aligned data' if args.is_aligned_alloc else ''}",
+        0.01,
+        1.01,
+        f"on {target_hardware}"
+        f"{', aligned data' if args.is_aligned_alloc else ''}"
+        " - Higher is Better",
         ha="left",
         va="bottom",
         fontsize=12,
@@ -76,47 +87,40 @@ def plot_bandwidth(args):
 
     # Set y-axis limit to start from zero
     ax.set_ylim(bottom=0)
-    # Set ticks on x-axis
-    ax.xaxis.set_major_formatter(
-        plt.FuncFormatter(lambda x, _: int(x))
-    )  # No scientific notation
     # Add grid
     ax.grid(True)
 
     # Set logarithmic scale if needed
     if args.is_full_sz:
         ax.set_xscale("log")
-        if args.target == "G3" or args.target == "G3E":
-            l1d = 65536
-            ax.axvline(x=l1d, color="r", linestyle="--")
-            ax.text(
-                l1d,
-                2,
-                "L1D$\n(64 KiB)",
-                color="black",
-                fontsize=12,
-                ha="center",
-                bbox=dict(
-                    facecolor="white", edgecolor="red", boxstyle="square,pad=0.5"
-                ),
-            )
-            l2 = 1048576
-            ax.axvline(x=l2, color="g", linestyle="--")
-            ax.text(
-                l2,
-                2,
-                "L2$\n(1 MiB)",
-                color="black",
-                fontsize=12,
-                ha="center",
-                bbox=dict(facecolor="white", edgecolor="g", boxstyle="square,pad=0.5"),
-            )
-            l3 = 33554432
+        ax.axvline(x=l1d, color="r", linestyle="--")
+        ax.text(
+            l1d,
+            2,
+            f"L1D$\n({l1d / 1024:.0f} KiB)",
+            color="black",
+            fontsize=12,
+            ha="center",
+            bbox=dict(
+                facecolor="white", edgecolor="red", boxstyle="square,pad=0.5"
+            ),
+        )
+        ax.axvline(x=l2, color="g", linestyle="--")
+        ax.text(
+            l2,
+            2,
+            f"L2$\n({l2 / 1048576:.0f} MiB)",
+            color="black",
+            fontsize=12,
+            ha="center",
+            bbox=dict(facecolor="white", edgecolor="g", boxstyle="square,pad=0.5"),
+        )
+        if l3 is not None:
             ax.axvline(x=l3, color="b", linestyle="--")
             ax.text(
                 l3,
                 2,
-                "L3$\n(32 MiB)",
+                f"L3$\n({l3 / 1048576:.0f} MiB)",
                 color="black",
                 fontsize=12,
                 ha="center",
