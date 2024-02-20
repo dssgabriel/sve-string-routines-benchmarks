@@ -46,7 +46,7 @@
 #define MAX_LEN_IN_BYTES 128ULL
 
 // Define `SMALL_STR` if nothing defined by the user
-#if !defined(SMALL_STR) && !defined(FULL_SIZES)
+#if !defined(SMALL_STR) && !defined(FULL_SIZE_RANGE)
 #define SMALL_STR
 #endif
 
@@ -596,19 +596,11 @@ int32_t main(int32_t argc, char *argv[argc + 1]) {
         buf_sizes[i] = i + 1;
         bench_reps[i] = 1000000;
     };
-#elif defined(CACHE_SIZES)
+#elif defined(FULL_SIZE_RANGE)
     size_t buf_sizes[] = {
-        HALF_L1D / 2, FULL_L1D / 2, HALF_L2 / 2, FULL_L2 / 2,
-        HALF_L3 / 2,  FULL_L3 / 2,  DRAM,
-    };
-    size_t bench_reps[] = {
-        100000, 10000, 10000, 1000, 1000, 100, 10,
-    };
-#elif defined(TEST)
-    size_t buf_sizes[] = {
-        64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, HALF_L1D, FULL_L1D, 131072, 262144,
-        HALF_L2, FULL_L2, 2097152, 4194304, 8388608, HALF_L3, FULL_L3, 67108864, 134217728,
-        268435456, 536870912,
+        64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072, 262144, 524288,
+        1048576, 2097152, 4194304, 8388608, 16777216, 33554432, 67108864, 134217728, 268435456,
+        536870912,
     };
     size_t bench_reps[] = {
         1000000, 1000000, 1000000, 100000, 100000, 100000, 10000, 10000, 10000, 1000, 1000, 1000,

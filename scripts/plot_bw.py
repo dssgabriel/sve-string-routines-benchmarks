@@ -33,7 +33,7 @@ def plot_bandwidth(args):
             target_hardware = "SiPearl Rhea1"
             l1d = 65536
             l2 = 1048576
-            l3 = 3774873
+            l3 = 33554432
         case _:
             target_hardware = "unknown hardware"
 
@@ -42,7 +42,6 @@ def plot_bandwidth(args):
         input_file,
         sep="|",
         skipinitialspace=True,
-        skiprows=lambda x: x == 1 or x % 3 == 1,
     )
     # Remove whitespace from column entries
     df = df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
@@ -59,14 +58,24 @@ def plot_bandwidth(args):
     fig, ax = plt.subplots(figsize=(14, 9))
 
     # Plot the data
+    if args.is_full_sz:
+        marker = "-o"
+    else:
+        marker = "-"
     for implementation, group in df.groupby("Implementation"):
-        ax.errorbar(
+        ax.plot(group["BUF SIZE B"], group["BW AVG GiB/s"], marker, label=implementation)
+        ax.fill_between(
             group["BUF SIZE B"],
-            group["BW AVG GiB/s"],
-            yerr=group["BW STDEV GiB/s"],
-            label=implementation,
-            marker="o",
+            group["BW AVG GiB/s"] - group["BW STDEV GiB/s"],
+            group["BW AVG GiB/s"] + group["BW STDEV GiB/s"],
+            alpha=0.3
         )
+        # ax.errorbar(
+        #     group["BUF SIZE B"],
+        #     group["BW AVG GiB/s"],
+        #     yerr=group["BW STDEV GiB/s"],
+        #     marker="o",
+        # )
 
     # Set title and labels
     ax.set_title(f"Average Bandwidth of `{routine_name}`\n", fontsize=24, loc="left")
@@ -193,4 +202,12 @@ if __name__ == "__main__":
             + os.path.basename(os.path.splitext(args.input)[0])
             + ".png"
         )
+
+    with open(args.input, "r+") as f:
+        d = f.readlines()
+        f.seek(0)
+        for l in d:
+            if not l.startswith("--"):
+                f.write(l)
+        f.truncate()
     plot_bandwidth(args)

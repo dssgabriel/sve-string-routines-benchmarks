@@ -2,11 +2,11 @@
 
 ## Benchmark methodology
 
-Our approach to benchmarking tries to be as straightforward, accurate, and reproducible as possible on different systems. All benchmark results presented in this repository were obtained on an AWS Graviton3E CPU (`hpc7g.16xlarge` instance, on kernel `6.2.0.amzn2.aarch64`, and compiled with GCC 12.2.0/ACFL 23.10).
+Our approach to benchmarking tries to be as straightforward, accurate, and reproducible as possible on different systems. All benchmark results presented in this repository were obtained on an AWS Graviton3E CPU (`hpc7g.16xlarge` instance, on kernel `6.2.0-1018-aws`, compiled with GCC 12.3.0).
 
 We benchmark each routine using two sets of sizes:
-1. Short strings: ranging from 1 to 128 Bytes (with increments of 1);
-2. Full sizes: ranging from 128 Bytes to 64 MiB (doubling the size each time).
+1. Short strings: ranging from 1 to 128 Bytes (with increments of 1), `-DSHORT_STRS`;
+2. Full size: ranging from 128 Bytes to 512 MiB (doubling the size each time), `-DFULL_SIZE_RANGE`.
 
 We can also enable aligned data allocations using the `-DALIGNED_ALLOCS` compile-time flag.
 
