@@ -2,6 +2,7 @@ import argparse
 import pandas as pd
 import matplotlib.pyplot as plt
 import os
+import seaborn as sns
 
 
 def plot_bandwidth(args):
@@ -50,10 +51,10 @@ def plot_bandwidth(args):
 
     # Extract relevant columns
     df = df[["ROUTINE IMPLEMENTATION", "BUF SIZE B", "BW AVG GiB/s", "BW STDEV GiB/s"]]
-
     df["Implementation"] = df["ROUTINE IMPLEMENTATION"]
     df["Average bandwidth (GiB/s)"] = df["BW AVG GiB/s"]
 
+    sns.set_palette("Accent", 3)
     # Create figure and axis objects
     fig, ax = plt.subplots(figsize=(14, 9))
 
@@ -70,12 +71,6 @@ def plot_bandwidth(args):
             group["BW AVG GiB/s"] + group["BW STDEV GiB/s"],
             alpha=0.3
         )
-        # ax.errorbar(
-        #     group["BUF SIZE B"],
-        #     group["BW AVG GiB/s"],
-        #     yerr=group["BW STDEV GiB/s"],
-        #     marker="o",
-        # )
 
     # Set title and labels
     ax.set_title(f"Average Bandwidth of `{routine_name}`\n", fontsize=24, loc="left")
