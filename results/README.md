@@ -121,8 +121,8 @@ On short strings, some specific string lengths show noticeable performance drops
 However, we think this is worth merging into AOR/libc as the overall performance gains largely outweigh the losses shown on some short string lengths with unaligned data. 
 
 <p>
-  <img src="plots/short/noalign/strcpy.png" width=49% alt="Average bandwidth performance of `strcpy` on short strings (unaligned data)">
-  <img src="plots/short/align/strcpy.png" align="right" width=49% alt="Average bandwidth performance of `strcpy` on short strings (aligned data)">
+  <img src="plots/shrt/noalign/strcpy.png" width=49% alt="Average bandwidth performance of `strcpy` on short strings (unaligned data)">
+  <img src="plots/shrt/align/strcpy.png" align="right" width=49% alt="Average bandwidth performance of `strcpy` on short strings (aligned data)">
 </p>
 <p>
   <img src="plots/full/noalign/strcpy.png" width=49% alt="Average bandwidth performance of `strcpy` (unaligned data)">
@@ -136,8 +136,8 @@ However, we think this is worth merging into AOR/libc as the overall performance
 Our implementation of `strncpy` largely beats GNU libc in almost all scenarios. Just like `strcpy`, some sizes are problematic for short, unaligned strings. However, this isn't as problematic as the SVE implementation matches the performance of the glibc, even on the worst-case string lengths. On larger data, we easily outperform the current implementation.
 
 <p>
-  <img src="plots/short/noalign/strncpy.png" width=49% alt="Average bandwidth performance of `strncpy` on short strings (unaligned data)">
-  <img src="plots/short/align/strncpy.png" align="right" width=49% alt="Average bandwidth performance of `strncpy` on short strings (aligned data)">
+  <img src="plots/shrt/noalign/strncpy.png" width=49% alt="Average bandwidth performance of `strncpy` on short strings (unaligned data)">
+  <img src="plots/shrt/align/strncpy.png" align="right" width=49% alt="Average bandwidth performance of `strncpy` on short strings (aligned data)">
 </p>
 <p>
   <img src="plots/full/noalign/strncpy.png" width=49% alt="Average bandwidth performance of `strncpy` (unaligned data)">
@@ -151,8 +151,8 @@ Our implementation of `strncpy` largely beats GNU libc in almost all scenarios. 
 For routines that don't need to write data to memory (i.e., no store instructions required), such as `strcmp`, we do not experience any slowdowns, even on unaligned data. Our implementation is thus better than the current GNU libc in all cases, except for string sizes in the ranges 1-16 bytes and 32-48 bytes, where we remain marginally slower than the NEON implementation from libc.
 
 <p>
-  <img src="plots/short/noalign/strcmp.png" width=49% alt="Average bandwidth performance of `strcmp` on short strings (unaligned data)">
-  <img src="plots/short/align/strcmp.png" align="right" width=49% alt="Average bandwidth performance of `strcmp` on short strings (aligned data)">
+  <img src="plots/shrt/noalign/strcmp.png" width=49% alt="Average bandwidth performance of `strcmp` on short strings (unaligned data)">
+  <img src="plots/shrt/align/strcmp.png" align="right" width=49% alt="Average bandwidth performance of `strcmp` on short strings (aligned data)">
 </p>
 <p>
   <img src="plots/full/noalign/strcmp.png" width=49% alt="Average bandwidth performance of `strcmp` (unaligned data)">
@@ -166,8 +166,8 @@ For routines that don't need to write data to memory (i.e., no store instruction
 Much like `strcmp`, our implementation of `strncmp` always performs better than glibc, except for string lengths in the range of 1-16 bytes, where we are very slightly behind.
 
 <p>
-  <img src="plots/short/noalign/strncmp.png" width=49% alt="Average bandwidth performance of `strncmp` on short strings (unaligned data)">
-  <img src="plots/short/align/strncmp.png" align="right" width=49% alt="Average bandwidth performance of `strncmp` on short strings (aligned data)">
+  <img src="plots/shrt/noalign/strncmp.png" width=49% alt="Average bandwidth performance of `strncmp` on short strings (unaligned data)">
+  <img src="plots/shrt/align/strncmp.png" align="right" width=49% alt="Average bandwidth performance of `strncmp` on short strings (aligned data)">
 </p>
 <p>
   <img src="plots/full/noalign/strncmp.png" width=49% alt="Average bandwidth performance of `strncmp` (unaligned data)">
@@ -184,8 +184,8 @@ We include hereafter the bandwidth plots for other string routine implementation
 ### `memcpy`
 
 <p>
-  <img src="plots/short/noalign/memcpy.png" width=49% alt="Average bandwidth performance of `memcpy` on short strings (unaligned data)">
-  <img align="right" src="plots/short/align/memcpy.png" width=49% alt="Average bandwidth performance of `memcpy` on short strings (aligned data)">
+  <img src="plots/shrt/noalign/memcpy.png" width=49% alt="Average bandwidth performance of `memcpy` on short strings (unaligned data)">
+  <img align="right" src="plots/shrt/align/memcpy.png" width=49% alt="Average bandwidth performance of `memcpy` on short strings (aligned data)">
 </p>
 <p>
   <img src="plots/full/noalign/memcpy.png" width=49% alt="Average bandwidth performance of `memcpy` (unaligned data)">
@@ -197,8 +197,8 @@ We include hereafter the bandwidth plots for other string routine implementation
 ### `memcmp`
 
 <p>
-  <img src="plots/short/noalign/memcmp.png" width=49% alt="Average bandwidth performance of `memcmp` on short strings (unaligned data)">
-  <img align="right" src="plots/short/align/memcmp.png" width=49% alt="Average bandwidth performance of `memcmp` on short strings (aligned data)">
+  <img src="plots/shrt/noalign/memcmp.png" width=49% alt="Average bandwidth performance of `memcmp` on short strings (unaligned data)">
+  <img align="right" src="plots/shrt/align/memcmp.png" width=49% alt="Average bandwidth performance of `memcmp` on short strings (aligned data)">
 </p>
 <p>
   <img src="plots/full/noalign/memcmp.png" width=49% alt="Average bandwidth performance of `memcmp` (unaligned data)">
@@ -210,8 +210,8 @@ We include hereafter the bandwidth plots for other string routine implementation
 ### `strlen`
 
 <p>
-  <img src="plots/short/noalign/strlen.png" width=49% alt="Average bandwidth performance of `strlen` on short strings (unaligned data)">
-  <img align="right" src="plots/short/align/strlen.png" width=49% alt="Average bandwidth performance of `strlen` on short strings (aligned data)">
+  <img src="plots/shrt/noalign/strlen.png" width=49% alt="Average bandwidth performance of `strlen` on short strings (unaligned data)">
+  <img align="right" src="plots/shrt/align/strlen.png" width=49% alt="Average bandwidth performance of `strlen` on short strings (aligned data)">
 </p>
 <p>
   <img src="plots/full/noalign/strlen.png" width=49% alt="Average bandwidth performance of `strlen` (unaligned data)">
@@ -223,8 +223,8 @@ We include hereafter the bandwidth plots for other string routine implementation
 ### `strnlen`
 
 <p>
-  <img src="plots/short/noalign/strnlen.png" width=49% alt="Average bandwidth performance of `strnlen` on short strings (unaligned data)">
-  <img align="right" src="plots/short/align/strnlen.png" width=49% alt="Average bandwidth performance of `strnlen` on short strings (aligned data)">
+  <img src="plots/shrt/noalign/strnlen.png" width=49% alt="Average bandwidth performance of `strnlen` on short strings (unaligned data)">
+  <img align="right" src="plots/shrt/align/strnlen.png" width=49% alt="Average bandwidth performance of `strnlen` on short strings (aligned data)">
 </p>
 <p>
   <img src="plots/full/noalign/strnlen.png" width=49% alt="Average bandwidth performance of `strnlen` (unaligned data)">
@@ -236,8 +236,8 @@ We include hereafter the bandwidth plots for other string routine implementation
 ### `strchr`
 
 <p>
-  <img src="plots/short/noalign/strchr.png" width=49% alt="Average bandwidth performance of `strchr` on short strings (unaligned data)">
-  <img align="right" src="plots/short/align/strchr.png" width=49% alt="Average bandwidth performance of `strchr` on short strings (aligned data)">
+  <img src="plots/shrt/noalign/strchr.png" width=49% alt="Average bandwidth performance of `strchr` on short strings (unaligned data)">
+  <img align="right" src="plots/shrt/align/strchr.png" width=49% alt="Average bandwidth performance of `strchr` on short strings (aligned data)">
 </p>
 <p>
   <img src="plots/full/noalign/strchr.png" width=49% alt="Average bandwidth performance of `strchr` (unaligned data)">
@@ -249,8 +249,8 @@ We include hereafter the bandwidth plots for other string routine implementation
 ### `strrchr`
 
 <p>
-  <img src="plots/short/noalign/strrchr.png" width=49% alt="Average bandwidth performance of `strrchr` on short strings (unaligned data)">
-  <img align="right" src="plots/short/align/strrchr.png" width=49% alt="Average bandwidth performance of `strrchr` on short strings (aligned data)">
+  <img src="plots/shrt/noalign/strrchr.png" width=49% alt="Average bandwidth performance of `strrchr` on short strings (unaligned data)">
+  <img align="right" src="plots/shrt/align/strrchr.png" width=49% alt="Average bandwidth performance of `strrchr` on short strings (aligned data)">
 </p>
 <p>
   <img src="plots/full/noalign/strrchr.png" width=49% alt="Average bandwidth performance of `strrchr` (unaligned data)">
