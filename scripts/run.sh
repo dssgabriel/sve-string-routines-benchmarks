@@ -1,12 +1,15 @@
 #!/bin/bash
 
-LIBC_BIN=build/release-libc/bench-sve-string-routines
-AOR_BIN=build/release-arm/bench-sve-string-routines
-
+BIN=bench-sve-string-routines
 routines=(memcmp strcmp strncmp memcpy strcpy strncpy strchr strrchr strlen strnlen)
 
-for i in ${!routines[@]}; do
-    j=$(($i + ${#routines[@]}))
-    taskset -c $i $LIBC_BIN --${routines[$i]} > results/raw/${routines[$i]}-libc.dat &
-    taskset -c $j $AOR_BIN --${routines[$i]} > results/raw/${routines[$i]}-aor.dat &
+for m in (shrt full); do
+    for a in (align noalign); do
+        for i in ${!routines[@]}; do
+            j=$(($i + ${#routines[@]}))
+
+            taskset -c $i build/gnu-${m}-${a}/$BIN --${routines[$i]} > results/raw/${m}/${a}/${routines[$i]}-gnu.dat &
+            taskset -c $j build/arm-${m}-${a}/$BIN --${routines[$i]} > results/raw/${m}/${a}/${routines[$i]}-arm.dat &
+        done
+    done
 done

@@ -442,11 +442,7 @@ void bench_strncpy(size_t nbench, size_t const buf_sizes[nbench], size_t const b
     for (size_t b = 0; b < nbench; ++b) {
         // Benchmark initialization
         benchmark_t strncpy_bench = {
-#ifdef CMP_LIBC
             .name_old = "strncpy (GNU libc 2.39)",
-#else
-            .name_old = "strncpy (Arm OR 23.01)",
-#endif
             .name_new = "strncpy (LI-PaRAD)",
             .nsamples = NSAMPLES,
             .nreps = bench_reps[b],
