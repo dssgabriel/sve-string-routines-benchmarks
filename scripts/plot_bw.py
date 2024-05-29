@@ -34,7 +34,7 @@ def plot_bandwidth(args):
             target_hardware = "SiPearl Rhea1"
             l1d = 65536
             l2 = 1048576
-            l3 = 33554432
+            l3 = 41943040
         case _:
             target_hardware = "unknown hardware"
 
@@ -63,7 +63,7 @@ def plot_bandwidth(args):
         marker = "-o"
     else:
         marker = "-"
-    for implementation, group in df.groupby("Implementation"):
+    for implementation, group in df.groupby("Implementation", sort=False):
         ax.plot(group["BUF SIZE B"], group["BW AVG GiB/s"], marker, label=implementation)
         ax.fill_between(
             group["BUF SIZE B"],
@@ -73,7 +73,7 @@ def plot_bandwidth(args):
         )
 
     # Set title and labels
-    ax.set_title(f"Average Bandwidth of `{routine_name}`\n", fontsize=24, loc="left")
+    ax.set_title(f"Average bandwidth of `{routine_name}`\n", fontsize=24, loc="left")
     ax.text(
         0.01,
         1.01,

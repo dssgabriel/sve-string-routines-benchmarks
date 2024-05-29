@@ -121,12 +121,12 @@ On short strings, some specific string lengths show noticeable performance drops
 However, we think this is worth merging into AOR/libc as the overall performance gains largely outweigh the losses shown on some short string lengths with unaligned data. 
 
 <p>
-  <img src="plots/shrt/noalign/strcpy.png" width=49% alt="Average bandwidth performance of `strcpy` on short strings (unaligned data)">
-  <img src="plots/shrt/align/strcpy.png" align="right" width=49% alt="Average bandwidth performance of `strcpy` on short strings (aligned data)">
+  <img src="plots/G3E/shrt/noalign/strcpy.png" width=49% alt="Average bandwidth performance of `strcpy` on short strings (unaligned data) on AWS Graviton3E">
+  <img src="plots/G3E/shrt/align/strcpy.png" align="right" width=49% alt="Average bandwidth performance of `strcpy` on short strings (aligned data) on AWS Graviton3E">
 </p>
 <p>
-  <img src="plots/full/noalign/strcpy.png" width=49% alt="Average bandwidth performance of `strcpy` (unaligned data)">
-  <img src="plots/full/align/strcpy.png" align="right" width=49% alt="Average bandwidth performance of `strcpy` (aligned data)">
+  <img src="plots/G3E/full/noalign/strcpy.png" width=49% alt="Average bandwidth performance of `strcpy` (unaligned data) on AWS Graviton3E">
+  <img src="plots/G3E/full/align/strcpy.png" align="right" width=49% alt="Average bandwidth performance of `strcpy` (aligned data) on AWS Graviton3E">
 </p>
 
 ---
@@ -136,12 +136,12 @@ However, we think this is worth merging into AOR/libc as the overall performance
 Our implementation of `strncpy` largely beats GNU libc in almost all scenarios. Just like `strcpy`, some sizes are problematic for short, unaligned strings. However, this isn't as problematic as the SVE implementation matches the performance of the glibc, even on the worst-case string lengths. On larger data, we easily outperform the current implementation.
 
 <p>
-  <img src="plots/shrt/noalign/strncpy.png" width=49% alt="Average bandwidth performance of `strncpy` on short strings (unaligned data)">
-  <img src="plots/shrt/align/strncpy.png" align="right" width=49% alt="Average bandwidth performance of `strncpy` on short strings (aligned data)">
+  <img src="plots/G3E/shrt/noalign/strncpy.png" width=49% alt="Average bandwidth performance of `strncpy` on short strings (unaligned data) on AWS Graviton3E">
+  <img src="plots/G3E/shrt/align/strncpy.png" align="right" width=49% alt="Average bandwidth performance of `strncpy` on short strings (aligned data) on AWS Graviton3E">
 </p>
 <p>
-  <img src="plots/full/noalign/strncpy.png" width=49% alt="Average bandwidth performance of `strncpy` (unaligned data)">
-  <img src="plots/full/align/strncpy.png" align="right" width=49% alt="Average bandwidth performance of `strncpy` (aligned data)">
+  <img src="plots/G3E/full/noalign/strncpy.png" width=49% alt="Average bandwidth performance of `strncpy` (unaligned data) on AWS Graviton3E">
+  <img src="plots/G3E/full/align/strncpy.png" align="right" width=49% alt="Average bandwidth performance of `strncpy` (aligned data) on AWS Graviton3E">
 </p>
 
 ---
@@ -151,12 +151,12 @@ Our implementation of `strncpy` largely beats GNU libc in almost all scenarios. 
 For routines that don't need to write data to memory (i.e., no store instructions required), such as `strcmp`, we do not experience any slowdowns, even on unaligned data. Our implementation is thus better than the current GNU libc in all cases, except for string sizes in the ranges 1-16 bytes and 32-48 bytes, where we remain marginally slower than the NEON implementation from libc.
 
 <p>
-  <img src="plots/shrt/noalign/strcmp.png" width=49% alt="Average bandwidth performance of `strcmp` on short strings (unaligned data)">
-  <img src="plots/shrt/align/strcmp.png" align="right" width=49% alt="Average bandwidth performance of `strcmp` on short strings (aligned data)">
+  <img src="plots/G3E/shrt/noalign/strcmp.png" width=49% alt="Average bandwidth performance of `strcmp` on short strings (unaligned data) on AWS Graviton3E">
+  <img src="plots/G3E/shrt/align/strcmp.png" align="right" width=49% alt="Average bandwidth performance of `strcmp` on short strings (aligned data) on AWS Graviton3E">
 </p>
 <p>
-  <img src="plots/full/noalign/strcmp.png" width=49% alt="Average bandwidth performance of `strcmp` (unaligned data)">
-  <img src="plots/full/align/strcmp.png" align="right" width=49% alt="Average bandwidth performance of `strcmp` (aligned data)">
+  <img src="plots/G3E/full/noalign/strcmp.png" width=49% alt="Average bandwidth performance of `strcmp` (unaligned data) on AWS Graviton3E">
+  <img src="plots/G3E/full/align/strcmp.png" align="right" width=49% alt="Average bandwidth performance of `strcmp` (aligned data) on AWS Graviton3E">
 </p>
 
 ---
@@ -166,12 +166,12 @@ For routines that don't need to write data to memory (i.e., no store instruction
 Much like `strcmp`, our implementation of `strncmp` always performs better than glibc, except for string lengths in the range of 1-16 bytes, where we are very slightly behind.
 
 <p>
-  <img src="plots/shrt/noalign/strncmp.png" width=49% alt="Average bandwidth performance of `strncmp` on short strings (unaligned data)">
-  <img src="plots/shrt/align/strncmp.png" align="right" width=49% alt="Average bandwidth performance of `strncmp` on short strings (aligned data)">
+  <img src="plots/G3E/shrt/noalign/strncmp.png" width=49% alt="Average bandwidth performance of `strncmp` on short strings (unaligned data) on AWS Graviton3E">
+  <img src="plots/G3E/shrt/align/strncmp.png" align="right" width=49% alt="Average bandwidth performance of `strncmp` on short strings (aligned data) on AWS Graviton3E">
 </p>
 <p>
-  <img src="plots/full/noalign/strncmp.png" width=49% alt="Average bandwidth performance of `strncmp` (unaligned data)">
-  <img src="plots/full/align/strncmp.png" align="right" width=49% alt="Average bandwidth performance of `strncmp` (aligned data)">
+  <img src="plots/G3E/full/noalign/strncmp.png" width=49% alt="Average bandwidth performance of `strncmp` (unaligned data) on AWS Graviton3E">
+  <img src="plots/G3E/full/align/strncmp.png" align="right" width=49% alt="Average bandwidth performance of `strncmp` (aligned data) on AWS Graviton3E">
 
 
 ## Inconclusive results
@@ -184,12 +184,12 @@ We include hereafter the bandwidth plots for other string routine implementation
 ### `memcpy`
 
 <p>
-  <img src="plots/shrt/noalign/memcpy.png" width=49% alt="Average bandwidth performance of `memcpy` on short strings (unaligned data)">
-  <img align="right" src="plots/shrt/align/memcpy.png" width=49% alt="Average bandwidth performance of `memcpy` on short strings (aligned data)">
+  <img src="plots/G3E/shrt/noalign/memcpy.png" width=49% alt="Average bandwidth performance of `memcpy` on short strings (unaligned data) on AWS Graviton3E">
+  <img align="right" src="plots/G3E/shrt/align/memcpy.png" width=49% alt="Average bandwidth performance of `memcpy` on short strings (aligned data) on AWS Graviton3E">
 </p>
 <p>
-  <img src="plots/full/noalign/memcpy.png" width=49% alt="Average bandwidth performance of `memcpy` (unaligned data)">
-  <img align="right" src="plots/full/align/memcpy.png" width=49% alt="Average bandwidth performance of `memcpy` (aligned data)">
+  <img src="plots/G3E/full/noalign/memcpy.png" width=49% alt="Average bandwidth performance of `memcpy` (unaligned data) on AWS Graviton3E">
+  <img align="right" src="plots/G3E/full/align/memcpy.png" width=49% alt="Average bandwidth performance of `memcpy` (aligned data) on AWS Graviton3E">
 </p>
 
 ---
@@ -197,12 +197,12 @@ We include hereafter the bandwidth plots for other string routine implementation
 ### `memcmp`
 
 <p>
-  <img src="plots/shrt/noalign/memcmp.png" width=49% alt="Average bandwidth performance of `memcmp` on short strings (unaligned data)">
-  <img align="right" src="plots/shrt/align/memcmp.png" width=49% alt="Average bandwidth performance of `memcmp` on short strings (aligned data)">
+  <img src="plots/G3E/shrt/noalign/memcmp.png" width=49% alt="Average bandwidth performance of `memcmp` on short strings (unaligned data) on AWS Graviton3E">
+  <img align="right" src="plots/G3E/shrt/align/memcmp.png" width=49% alt="Average bandwidth performance of `memcmp` on short strings (aligned data) on AWS Graviton3E">
 </p>
 <p>
-  <img src="plots/full/noalign/memcmp.png" width=49% alt="Average bandwidth performance of `memcmp` (unaligned data)">
-  <img align="right" src="plots/full/align/memcmp.png" width=49% alt="Average bandwidth performance of `memcmp` (aligned data)">
+  <img src="plots/G3E/full/noalign/memcmp.png" width=49% alt="Average bandwidth performance of `memcmp` (unaligned data) on AWS Graviton3E">
+  <img align="right" src="plots/G3E/full/align/memcmp.png" width=49% alt="Average bandwidth performance of `memcmp` (aligned data) on AWS Graviton3E">
 </p>
 
 ---
@@ -210,12 +210,12 @@ We include hereafter the bandwidth plots for other string routine implementation
 ### `strlen`
 
 <p>
-  <img src="plots/shrt/noalign/strlen.png" width=49% alt="Average bandwidth performance of `strlen` on short strings (unaligned data)">
-  <img align="right" src="plots/shrt/align/strlen.png" width=49% alt="Average bandwidth performance of `strlen` on short strings (aligned data)">
+  <img src="plots/G3E/shrt/noalign/strlen.png" width=49% alt="Average bandwidth performance of `strlen` on short strings (unaligned data) on AWS Graviton3E">
+  <img align="right" src="plots/G3E/shrt/align/strlen.png" width=49% alt="Average bandwidth performance of `strlen` on short strings (aligned data) on AWS Graviton3E">
 </p>
 <p>
-  <img src="plots/full/noalign/strlen.png" width=49% alt="Average bandwidth performance of `strlen` (unaligned data)">
-  <img align="right" src="plots/full/align/strlen.png" width=49% alt="Average bandwidth performance of `strlen` (aligned data)">
+  <img src="plots/G3E/full/noalign/strlen.png" width=49% alt="Average bandwidth performance of `strlen` (unaligned data) on AWS Graviton3E">
+  <img align="right" src="plots/G3E/full/align/strlen.png" width=49% alt="Average bandwidth performance of `strlen` (aligned data) on AWS Graviton3E">
 </p>
 
 ---
@@ -223,12 +223,12 @@ We include hereafter the bandwidth plots for other string routine implementation
 ### `strnlen`
 
 <p>
-  <img src="plots/shrt/noalign/strnlen.png" width=49% alt="Average bandwidth performance of `strnlen` on short strings (unaligned data)">
-  <img align="right" src="plots/shrt/align/strnlen.png" width=49% alt="Average bandwidth performance of `strnlen` on short strings (aligned data)">
+  <img src="plots/G3E/shrt/noalign/strnlen.png" width=49% alt="Average bandwidth performance of `strnlen` on short strings (unaligned data) on AWS Graviton3E">
+  <img align="right" src="plots/G3E/shrt/align/strnlen.png" width=49% alt="Average bandwidth performance of `strnlen` on short strings (aligned data) on AWS Graviton3E">
 </p>
 <p>
-  <img src="plots/full/noalign/strnlen.png" width=49% alt="Average bandwidth performance of `strnlen` (unaligned data)">
-  <img align="right" src="plots/full/align/strnlen.png" width=49% alt="Average bandwidth performance of `strnlen` (aligned data)">
+  <img src="plots/G3E/full/noalign/strnlen.png" width=49% alt="Average bandwidth performance of `strnlen` (unaligned data) on AWS Graviton3E">
+  <img align="right" src="plots/G3E/full/align/strnlen.png" width=49% alt="Average bandwidth performance of `strnlen` (aligned data) on AWS Graviton3E">
 </p>
 
 ---
@@ -236,12 +236,12 @@ We include hereafter the bandwidth plots for other string routine implementation
 ### `strchr`
 
 <p>
-  <img src="plots/shrt/noalign/strchr.png" width=49% alt="Average bandwidth performance of `strchr` on short strings (unaligned data)">
-  <img align="right" src="plots/shrt/align/strchr.png" width=49% alt="Average bandwidth performance of `strchr` on short strings (aligned data)">
+  <img src="plots/G3E/shrt/noalign/strchr.png" width=49% alt="Average bandwidth performance of `strchr` on short strings (unaligned data) on AWS Graviton3E">
+  <img align="right" src="plots/G3E/shrt/align/strchr.png" width=49% alt="Average bandwidth performance of `strchr` on short strings (aligned data) on AWS Graviton3E">
 </p>
 <p>
-  <img src="plots/full/noalign/strchr.png" width=49% alt="Average bandwidth performance of `strchr` (unaligned data)">
-  <img align="right" src="plots/full/align/strchr.png" width=49% alt="Average bandwidth performance of `strchr` (aligned data)">
+  <img src="plots/G3E/full/noalign/strchr.png" width=49% alt="Average bandwidth performance of `strchr` (unaligned data) on AWS Graviton3E">
+  <img align="right" src="plots/G3E/full/align/strchr.png" width=49% alt="Average bandwidth performance of `strchr` (aligned data) on AWS Graviton3E">
 </p>
 
 ---
@@ -249,12 +249,12 @@ We include hereafter the bandwidth plots for other string routine implementation
 ### `strrchr`
 
 <p>
-  <img src="plots/shrt/noalign/strrchr.png" width=49% alt="Average bandwidth performance of `strrchr` on short strings (unaligned data)">
-  <img align="right" src="plots/shrt/align/strrchr.png" width=49% alt="Average bandwidth performance of `strrchr` on short strings (aligned data)">
+  <img src="plots/G3E/shrt/noalign/strrchr.png" width=49% alt="Average bandwidth performance of `strrchr` on short strings (unaligned data) on AWS Graviton3E">
+  <img align="right" src="plots/G3E/shrt/align/strrchr.png" width=49% alt="Average bandwidth performance of `strrchr` on short strings (aligned data) on AWS Graviton3E">
 </p>
 <p>
-  <img src="plots/full/noalign/strrchr.png" width=49% alt="Average bandwidth performance of `strrchr` (unaligned data)">
-  <img align="right" src="plots/full/align/strrchr.png" width=49% alt="Average bandwidth performance of `strrchr` (aligned data)">
+  <img src="plots/G3E/full/noalign/strrchr.png" width=49% alt="Average bandwidth performance of `strrchr` (unaligned data) on AWS Graviton3E">
+  <img align="right" src="plots/G3E/full/align/strrchr.png" width=49% alt="Average bandwidth performance of `strrchr` (aligned data) on AWS Graviton3E">
 </p>
 
 </details>
